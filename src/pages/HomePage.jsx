@@ -7,8 +7,8 @@ import './HomePage.css';
 const HomePage = () => {
   return (
     <div>
-        <LeftBar />
-        <HeaderBar/>
+        <LeftBar activeMenu="mainmenu"/>
+        <HeaderBar title="Trang chủ" />
         <h2>Tổng quan</h2>
     </div>
    )
