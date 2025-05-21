@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { SiLastpass } from "react-icons/si";
+import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');
@@ -37,7 +38,7 @@ const SignupForm = () => {
 
     if (Object.keys(newErrors).length === 0) {
       alert('Đăng ký thành công!');
-      // Xử lý đăng ký ở đây
+      navigate('/login');
     }
   };
 

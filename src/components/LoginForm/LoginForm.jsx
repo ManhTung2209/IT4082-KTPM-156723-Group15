@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LoginForm.css';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [remember, setRemember] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('rememberMe'));
+    if (saved) {
+      setUsername(saved.username);
+      setPassword(saved.password);
+      setRemember(true);
+    }
+  }, []);
 
   const validateEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
@@ -26,6 +37,12 @@ const LoginForm = () => {
     }
     setError('');
     alert('Đăng nhập thành công!');
+    if (remember) {
+      localStorage.setItem('rememberMe', JSON.stringify({ username, password }));
+    } else {
+      localStorage.removeItem('rememberMe');
+    }
+    navigate('/');
   };
 
   return (
@@ -58,7 +75,11 @@ const LoginForm = () => {
 
           <div className='remember'>
             <label>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={e => setRemember(e.target.checked)}
+              />
               Ghi nhớ tôi
             </label>
             <Link to="/forgot-password">Quên mật khẩu</Link>
