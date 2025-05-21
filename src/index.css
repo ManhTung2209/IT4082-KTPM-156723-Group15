@@ -14,10 +14,19 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: slateblue;
+  background: white;
 }
 
+a{
+  text-decoration: none;
+  color: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
 
+h2{
+  text-align: left;
+}
 
 code {
   font-family: 'Courier New', Courier, monospace;

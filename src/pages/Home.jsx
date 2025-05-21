@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import '../index.css'
-import HomeButton from '../components/Button/HomeButton'
 const Home = () => {
   return (
     <div style={{
