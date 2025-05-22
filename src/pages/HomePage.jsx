@@ -2,7 +2,7 @@ import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import LeftBar from "../components/NavBar/LeftBar";
 import HeaderBar from "../components/NavBar/HeaderBar";
-import './HomePage.css';
+import './Page.css';
 
 const HomePage = () => {
   return (
