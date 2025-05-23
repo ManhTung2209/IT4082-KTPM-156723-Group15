@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import CitizenInfo from "./CitizenInfo";
+import HouseholdInfo from "./HouseholdInfo";
 
-const CitizenAdd = ({ defaultHousehold }) => {
-  const [citizen, setCitizen] = useState({
-    name: "",
-    age: "",
-    address: "",
-    household: defaultHousehold || "",
+const HouseholdAdd = ({ defaultHousehold }) => {
+  const [household, setHousehold] = useState({
+    id: "",
+    household: "",
+    owner: "",
+    person: defaultHousehold || "",
     status: "Đang ở",
   });
 
   const handleChange = (e) => {
-    setCitizen({ ...citizen, [e.target.name]: e.target.value });
+    setHousehold({ ...household, [e.target.owner]: e.target.value });
   };
 
   const handleAdd = () => {
@@ -49,4 +49,4 @@ const CitizenAdd = ({ defaultHousehold }) => {
   );
 };
 
-export default CitizenAdd;
+export default HouseholdAdd;

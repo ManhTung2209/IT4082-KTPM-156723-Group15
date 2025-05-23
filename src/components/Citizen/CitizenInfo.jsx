@@ -6,12 +6,17 @@ const CitizenInfo = ({ citizen }) => {
 
   return (
     <div className="citizen-info">
-      <div><strong>Họ tên:</strong> {citizen.name}</div>
-      <div><strong>Tuổi:</strong> {citizen.age}</div>
-      <div><strong>Địa chỉ:</strong> {citizen.address}</div>
-      <div><strong>Căn hộ:</strong> {citizen.household}</div>
-      <div><strong>Trạng thái:</strong> {citizen.status}</div>
-      {/* Thêm các trường khác nếu cần */}
+      <div className="info-grid">
+        <div><strong>Họ tên:</strong> {citizen.name}</div>
+        <div><strong>Số phòng:</strong> {citizen.household}</div>
+        <div><strong>Giới tính:</strong> {citizen.gender}</div>
+       <div><strong>Ngày cấp:</strong> {citizen.cccdIssueDate}</div>
+        <div><strong>Quê quán:</strong> {citizen.hometown}</div>
+        <div><strong>Mã CCCD:</strong> {citizen.cccd}</div>
+         <div><strong>Năm sinh:</strong> {citizen.birthYear}</div>
+        <div><strong>Nơi cấp:</strong> {citizen.cccdIssuePlace}</div>
+        <div><strong>Trạng thái:</strong> {citizen.status}</div>
+      </div>
     </div>
   );
 };

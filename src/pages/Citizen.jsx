@@ -2,22 +2,48 @@ import React, { useEffect, useState } from "react";
 import "./Page.css";
 import LeftBar from "../components/NavBar/LeftBar";
 import HeaderBar from "../components/NavBar/HeaderBar";
-import CitizenInfoModal from "../components/Citizen/CitizenInfoModal";
+import CitizenDetailEditModal from "../components/Citizen/CitizenDetailEditModal";
+import CitizenAddModal from "../components/Citizen/CitizenAddModal"; // Thêm dòng này
 
 // Giả lập dữ liệu cư dân
 const mockCitizens = [
-  { id: 1, name: "Nguyễn Văn A", household: 502, status: "Sinh sống" },
-  { id: 2, name: "Trần Thị B", household: 502, status: "Tạm trú" },
-  { id: 3, name: "Lê Văn C", household: 503, status: "Tạm vắng" },
-  { id: 4, name: "Phạm Văn D", household: 504, status: "Sinh sống" },
-  { id: 5, name: "Hoàng Thị E", household: 506, status: "Tạm trú" },
-  { id: 6, name: "Đỗ Văn F", household: 508, status: "Tạm trú" },
-  { id: 7, name: "Ngô Thị G", household: 502, status: "Tạm vắng" },
-  { id: 8, name: "Bùi Văn H", household: 502, status: "Sinh sống" },
-  { id: 9, name: "Lý Thị I", household: 502, status: "Sinh sống" },
-  { id: 10, name: "Trịnh Văn K", household: 502, status: "Tạm trú" },
-  { id: 11, name: "Phan Thị L", household: 502, status: "Tạm vắng" },
-  { id: 12, name: "Vũ Văn M", household: 502, status: "Sinh sống" },
+  {
+    id: 1,
+    name: "Nguyễn Văn A",
+    household: 502,
+    gender: "Nam",
+    birthYear: 1990,
+    hometown: "Hà Nội",
+    cccd: "012345678901",
+    cccdIssueDate: "2015-01-01",
+    cccdIssuePlace: "Cục Cảnh sát QLHC",
+    status: "Sinh sống"
+  },
+  {
+    id: 2,
+    name: "Trần Thị B",
+    household: 502,
+    gender: "Nữ",
+    birthYear: 1992,
+    hometown: "Hải Phòng",
+    cccd: "012345678902",
+    cccdIssueDate: "2016-02-02",
+    cccdIssuePlace: "Cục Cảnh sát QLHC",
+    status: "Tạm trú"
+  },
+  {
+    id: 3,
+    name: "Lê Văn C",
+    household: 503,
+    gender: "Nam",
+    birthYear: 1988,
+    hometown: "Nam Định",
+    cccd: "012345678903",
+    cccdIssueDate: "2017-03-03",
+    cccdIssuePlace: "Cục Cảnh sát QLHC",
+    status: "Tạm vắng"
+  },
+  // ...các phần tử còn lại, bổ sung tương tự...
 ];
 
 const PAGE_SIZE = 8;
@@ -31,9 +57,19 @@ const Citizen = () => {
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+
   useEffect(() => {
     setCitizens(mockCitizens);
   }, []);
+
+  const handleAddCitizen = (newCitizen) => {
+    setCitizens(prev => [
+      ...prev,
+      { ...newCitizen, id: prev.length ? prev[prev.length - 1].id + 1 : 1 },
+    ]);
+  };
 
   const filteredCitizens = citizens.filter(
     c =>
@@ -73,6 +109,14 @@ const Citizen = () => {
             className="content-search-input"
           />
         </div>
+<button
+            className="add-btn"
+            style={{ padding: "8px 16px", background: "#1890ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
+            onClick={() => setAddModalOpen(true)}
+          >
+            + Thêm cư dân
+          </button>
+
         <div className="content">
           <table className="content-table">
             <thead>
@@ -129,10 +173,16 @@ const Citizen = () => {
         </div>
       </div>
       {/* Modal hiển thị thông tin cư dân */}
-      <CitizenInfoModal
+      <CitizenDetailEditModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         citizen={selectedCitizen}
+      />
+      <CitizenAddModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        // Gọi hàm thêm cư dân khi submit (nếu bạn muốn truyền callback)
+        // onAdd={handleAddCitizen}
       />
     </div>
   );
