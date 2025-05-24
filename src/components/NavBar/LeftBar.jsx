@@ -48,7 +48,7 @@ const LeftBar = ({ activeMenu }) => {
           <button
             className={`householdbtn${activeMenu === 'household' ? ' active' : ''}`}
           >
-            <PiBuildingApartment className='household-icon' />Hộ khẩu
+            <PiBuildingApartment className='household-icon' />Hộ dân
           </button>
           </Link>
           <button className='logoutbtn'>

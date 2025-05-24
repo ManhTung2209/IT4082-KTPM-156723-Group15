@@ -1,20 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../Modal/Modal";
 import CitizenInfo from "./CitizenInfo";
 import "./CitizenInfo.css";
 
-const CitizenAddModal = ({ open, onClose, defaultHousehold }) => {
+const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
   const [citizen, setCitizen] = useState({
     name: "",
-    household: defaultHousehold || "",
+    household: householdNumber || "",
     gender: "",
     birthYear: "",
     hometown: "",
     cccd: "",
     cccdIssueDate: "",
     cccdIssuePlace: "",
-    status: "Đang ở",
+    status: "Sinh sống",
   });
+
+  // Reset lại mã hộ dân mỗi khi modal mở hoặc householdNumber thay đổi
+  useEffect(() => {
+    if (open) {
+      setCitizen(c => ({
+        ...c,
+        household: householdNumber || "",
+      }));
+    }
+  }, [open, householdNumber]);
 
   const handleChange = (e) => {
     setCitizen({ ...citizen, [e.target.name]: e.target.value });
@@ -23,16 +33,17 @@ const CitizenAddModal = ({ open, onClose, defaultHousehold }) => {
   const handleAdd = () => {
     // Gọi API thêm cư dân ở đây
     alert("Đã thêm cư dân mới!");
+    if (onAddCitizen) onAddCitizen();
     setCitizen({
       name: "",
-      household: defaultHousehold || "",
+      household: householdNumber || "",
       gender: "",
       birthYear: "",
       hometown: "",
       cccd: "",
       cccdIssueDate: "",
       cccdIssuePlace: "",
-      status: "",
+      status: "Sinh sống",
     });
     onClose();
   };
@@ -47,8 +58,13 @@ const CitizenAddModal = ({ open, onClose, defaultHousehold }) => {
           <input name="name" value={citizen.name} onChange={handleChange} />
         </div>
         <div>
-          <label>Số phòng: </label>
-          <input name="household" value={citizen.household} onChange={handleChange} />
+          <label>Mã hộ dân: </label>
+          <input
+              name="household"
+              value={citizen.household}
+              onChange={handleChange}
+              readOnly // Nếu muốn không cho sửa mã hộ dân
+            />
         </div>
         <div>
           <label>Giới tính: </label>

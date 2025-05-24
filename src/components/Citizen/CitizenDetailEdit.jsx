@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import CitizenInfo from "./CitizenInfo";
 import { useNavigate } from "react-router-dom";
+import HouseholdInfoModal from "../Household/HouseholdInfoModal";
+import { mockHouseholds } from "../../pages/Household";
 
 const CitizenDetailEdit = ({ citizen }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedCitizen, setEditedCitizen] = useState(citizen);
   const navigate = useNavigate();
+
+  const [householdModalOpen, setHouseholdModalOpen] = useState(false);
+  const [selectedHousehold, setSelectedHousehold] = useState(null);
 
   // Cập nhật lại state khi prop citizen thay đổi
   useEffect(() => {
@@ -78,16 +83,41 @@ const CitizenDetailEdit = ({ citizen }) => {
       )}
       <div style={{ marginTop: 20 }}>
         {!editMode ? (
-          <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
-        ) : (
-          <button onClick={handleSave}>Lưu thông tin</button>
-        )}
-        <button
-          style={{ marginLeft: 12 }}
-          onClick={() => navigate(`/household/${editedCitizen.household}`)}
-        >
-          Xem thông tin căn hộ
+    <>
+      <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+      <button
+        style={{ marginLeft: 12 }}
+        onClick={() => {
+          const household = mockHouseholds.find(
+            h => String(h.householdNumber) === String(editedCitizen.household)
+          );
+          setSelectedHousehold(household);
+          setHouseholdModalOpen(true);
+          }}
+          >
+        Xem thông tin hộ dân
         </button>
+        <button
+        style={{ marginLeft: 12 }}
+        onClick={() => {
+          // Xử lý xóa cư dân ở đây (API hoặc cập nhật state)
+          if (window.confirm("Bạn có chắc chắn muốn xóa cư dân này?")) {
+            // TODO: Gọi API hoặc cập nhật state cha
+            alert("Đã xóa cư dân!");
+          }
+        }}
+      >
+        Xóa cư dân
+      </button>
+        </>
+        ) : (
+        <button onClick={handleSave}>Lưu thông tin</button>
+        )}
+        <HouseholdInfoModal
+          open={householdModalOpen}
+          onClose={() => setHouseholdModalOpen(false)}
+          household={selectedHousehold}
+        />
       </div>
     </div>
   );

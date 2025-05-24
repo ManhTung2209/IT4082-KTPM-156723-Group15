@@ -3,10 +3,10 @@ import "./Page.css";
 import LeftBar from "../components/NavBar/LeftBar";
 import HeaderBar from "../components/NavBar/HeaderBar";
 import CitizenDetailEditModal from "../components/Citizen/CitizenDetailEditModal";
-import CitizenAddModal from "../components/Citizen/CitizenAddModal"; // Thêm dòng này
+import CitizenTable from "../components/Citizen/CitizenTable";
 
 // Giả lập dữ liệu cư dân
-const mockCitizens = [
+export const mockCitizens = [
   {
     id: 1,
     name: "Nguyễn Văn A",
@@ -57,25 +57,17 @@ const Citizen = () => {
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [addModalOpen, setAddModalOpen] = useState(false);
-
-
   useEffect(() => {
     setCitizens(mockCitizens);
   }, []);
-
-  const handleAddCitizen = (newCitizen) => {
-    setCitizens(prev => [
-      ...prev,
-      { ...newCitizen, id: prev.length ? prev[prev.length - 1].id + 1 : 1 },
-    ]);
-  };
 
   const filteredCitizens = citizens.filter(
     c =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.status.toLowerCase().includes(search.toLowerCase()) ||
-      c.household.toString().includes(search)
+      c.household.toString().includes(search) ||
+      c.hometown.toLowerCase().includes(search.toLowerCase()) ||
+      c.status.toLowerCase().includes(search.toLowerCase())
   );
 
   useEffect(() => {
@@ -103,54 +95,20 @@ const Citizen = () => {
         <div className="content-search">
           <input
             type="text"
-            placeholder="Tìm kiếm tên hoặc địa chỉ..."
+            placeholder="Tìm kiếm"
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="content-search-input"
           />
         </div>
-<button
-            className="add-btn"
-            style={{ padding: "8px 16px", background: "#1890ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
-            onClick={() => setAddModalOpen(true)}
-          >
-            + Thêm cư dân
-          </button>
 
         <div className="content">
-          <table className="content-table">
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Họ tên</th>
-                <th>Căn hộ</th>
-                <th>Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pagedCitizens.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="content-table-empty">
-                    Không có dữ liệu
-                  </td>
-                </tr>
-              ) : (
-                pagedCitizens.map((c, idx) => (
-                  <tr
-                    key={c.id}
-                    className="citizen-row"
-                    onClick={() => handleRowClick(c)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                    <td>{c.name}</td>
-                    <td>{c.household}</td>
-                    <td>{c.status}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <CitizenTable
+            citizens={pagedCitizens}
+            onRowClick={handleRowClick}
+            page={page}
+           pageSize={PAGE_SIZE}
+        />
           <div className="content-pagination">
             <button
               onClick={() => setPage(page - 1)}
@@ -177,12 +135,6 @@ const Citizen = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         citizen={selectedCitizen}
-      />
-      <CitizenAddModal
-        open={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        // Gọi hàm thêm cư dân khi submit (nếu bạn muốn truyền callback)
-        // onAdd={handleAddCitizen}
       />
     </div>
   );

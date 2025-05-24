@@ -3,31 +3,26 @@ import LeftBar from "../components/NavBar/LeftBar";
 import HeaderBar from "../components/NavBar/HeaderBar";
 import HouseholdInfoModal from "../components/Household/HouseholdInfoModal"; 
 import "./Page.css";
+import { mockCitizens } from "./Citizen"; // Giả lập dữ liệu cư dân
 
 // Giả lập dữ liệu hộ dân
-const mockHouseholds = [
+export const mockHouseholds = [
   {
     id: 1,
     householdNumber: 502,
     owner: "Nguyễn Văn A",
-    address: "Tòa A, phòng 502",
-    memberCount: 4,
     status: "Đang ở"
   },
   {
     id: 2,
     householdNumber: 503,
     owner: "Lê Văn C",
-    address: "Tòa B, phòng 503",
-    memberCount: 3,
     status: "Tạm trú"
   },
   {
     id: 3,
     householdNumber: 504,
     owner: "Phạm Thị D",
-    address: "Tòa C, phòng 504",
-    memberCount: 2,
     status: "Tạm vắng"
   },
 ];
@@ -49,8 +44,7 @@ const Household = () => {
   const filteredHouseholds = households.filter(
     h =>
       h.owner.toLowerCase().includes(search.toLowerCase()) ||
-      h.address.toLowerCase().includes(search.toLowerCase()) ||
-      h.householdNumber.toString().includes(search)
+      h.householdNumber.toString().includes(search) 
   );
 
   useEffect(() => {
@@ -77,7 +71,7 @@ const Household = () => {
         <div className="content-search">
           <input
             type="text"
-            placeholder="Tìm kiếm chủ hộ, địa chỉ hoặc số phòng..."
+            placeholder="Tìm kiếm"
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="content-search-input"
@@ -88,38 +82,43 @@ const Household = () => {
             <thead>
               <tr>
                 <th>STT</th>
-                <th>Số hộ khẩu</th>
+                <th>Mã hộ dân</th>
                 <th>Chủ hộ</th>
-                <th>Địa chỉ</th>
-                <th>Số thành viên</th>
-                <th>Trạng thái</th>
+                <th>Số cư dân đang cư trú</th>
               </tr>
             </thead>
             <tbody>
               {pagedHouseholds.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="content-table-empty">
+                  <td colSpan={5} className="content-table-empty">
                     Không có dữ liệu
                   </td>
-                </tr>
-              ) : (
-                pagedHouseholds.map((h, idx) => (
-                  <tr
-                    key={h.id}
-                    className="household-row"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleRowClick(h)}
-                  >
-                    <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                    <td>{h.householdNumber}</td>
-                    <td>{h.owner}</td>
-                    <td>{h.address}</td>
-                    <td>{h.memberCount}</td>
-                    <td>{h.status}</td>
-                  </tr>
-                ))
+                 </tr>
+               ) : (
+                  pagedHouseholds.map((h, idx) => {
+                  // Tính số cư dân đang cư trú cho từng hộ dân
+                  const livingCount = mockCitizens.filter(
+                    c =>
+                      String(c.household) === String(h.householdNumber) &&
+                      (c.status === "Sinh sống" || c.status === "Tạm trú")
+                  ).length;
+
+                  return (
+                    <tr
+                      key={h.id}
+                      className="household-row"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleRowClick(h)}
+                    >
+                      <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
+                      <td>{h.householdNumber}</td>
+                      <td>{h.owner}</td>
+                      <td>{livingCount}</td>
+                    </tr>
+                  );
+                })
               )}
-            </tbody>
+          </tbody>
           </table>
           <div className="content-pagination">
             <button
