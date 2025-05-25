@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 /**
  * @param {Object} props
- * @param {'mainmenu'|'fee'|'toll'|'citizen'|'household'} props.activeMenu
+ * @param {'mainmenu'|'fee'|'charge'|'citizen'|'household'} props.activeMenu
  */
 const LeftBar = ({ activeMenu }) => {
   return (
@@ -31,9 +31,9 @@ const LeftBar = ({ activeMenu }) => {
               <MdOutlineFeed className='mainmenu-icon' />Khoản thu
             </button>
           </Link>
-          <Link to="/toll" style={{ textDecoration: 'none' }}>
+          <Link to="/charge" style={{ textDecoration: 'none' }}>
             <button
-              className={`mainmenubtn${activeMenu === 'toll' ? ' active' : ''}`}
+              className={`mainmenubtn${activeMenu === 'charge' ? ' active' : ''}`}
             >
               <MdOutlineFeed className='mainmenu-icon' />Thu Phí
             </button>

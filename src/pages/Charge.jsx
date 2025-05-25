@@ -4,7 +4,7 @@ import HeaderBar from "../components/NavBar/HeaderBar";
 import "./Page.css";
 
 // Giả lập dữ liệu các lần nộp tiền
-const mockTollRecords = [
+const mockChargeRecords = [
   {
     id: 1,
     householdNumber: 502,
@@ -25,8 +25,8 @@ const mockTollRecords = [
 
 const PAGE_SIZE = 10;
 
-const Toll = () => {
-  const [records, setRecords] = useState(mockTollRecords);
+const Charge = () => {
+  const [records, setRecords] = useState(mockChargeRecords);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     householdNumber: "",
@@ -40,10 +40,18 @@ const Toll = () => {
   const [page, setPage] = useState(1);
 
   const handleChange = e => {
+    if (!form.householdNumber || !form.owner || !form.feeName || !form.amount || !form.paidAt){
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleAdd = () => {
+    if (!form.householdNumber || !form.owner || !form.feeName || !form.amount || !form.paidAt){
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
     setRecords([
       ...records,
       {
@@ -85,7 +93,7 @@ const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
 
   return (
     <div>
-      <LeftBar activeMenu="toll" />
+      <LeftBar activeMenu="charge" />
       <HeaderBar title="Thu Phí" />
       <div className="content-container">
         <h2 className="content-title">Thống kê các lần nộp tiền</h2>
@@ -198,4 +206,4 @@ const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
   );
 };
 
-export default Toll;
+export default Charge;

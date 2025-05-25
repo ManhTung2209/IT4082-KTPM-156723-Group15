@@ -65,6 +65,7 @@ const Citizen = () => {
     c =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.status.toLowerCase().includes(search.toLowerCase()) ||
+      c.birthYear.toString().includes(search) ||
       c.household.toString().includes(search) ||
       c.hometown.toLowerCase().includes(search.toLowerCase()) ||
       c.status.toLowerCase().includes(search.toLowerCase())

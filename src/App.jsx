@@ -9,7 +9,7 @@ import DashBoard from './Pages/DashBoard';
 import Citizen from './pages/Citizen';
 import Household from './Pages/Household';
 import Fee from './pages/Fee';  
-import Toll from './pages/Toll';
+import Charge from './Pages/Charge';
 function App() {
   return (
     <Router>
@@ -22,7 +22,7 @@ function App() {
         <Route path="/citizen" element={<Citizen />} />
         <Route path="/household" element={<Household />} />
         <Route path="/fee" element={<Fee />} />
-        <Route path="/toll" element={<Toll />} />
+        <Route path="/charge" element={<Charge />} />
         <Route path="/homepage" element={<DashBoard />} />
         <Route path="*" element={<Home />} />
       </Routes>

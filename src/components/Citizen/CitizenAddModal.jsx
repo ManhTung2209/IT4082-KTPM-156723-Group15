@@ -31,6 +31,11 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
   };
 
   const handleAdd = () => {
+    if(!citizen.name || !citizen.household || !citizen.gender || !citizen.birthYear || !citizen.hometown || !citizen.cccd
+      || !citizen.cccdIssueDate || !citizen.cccdIssuePlace){
+        alert("Vui lòng nhập đầy đủ thông tin");
+        return;
+      }
     // Gọi API thêm cư dân ở đây
     alert("Đã thêm cư dân mới!");
     if (onAddCitizen) onAddCitizen();
