@@ -1,0 +1,78 @@
+.citizen-info-edit {
+    height: 270px;
+    width: 1040px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #eee;
+    padding: 18px 20px;
+    margin-top: 12px;   
+}
+
+.citizen-info-edit label {
+    font-weight: 600;
+    margin-right: 8px;
+    min-width: 80px;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.citizen-info-edit input {
+    padding: 7px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+    width: 220px;
+    margin-left: 8px;
+}
+
+.citizen-info-edit input:focus {
+    border-color: #4a5cff;
+    outline: none;
+}
+
+.citizen-info-edit select {
+    height: 30px;
+    width: 100px;
+    color: #000;
+    font-weight: 500;
+}
+
+.citizen-info {
+    height: 480px;
+    width: 1040px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #eee;
+    padding: 18px 20px;
+    margin-top: 12px;
+}
+
+.citizen-info div {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    padding: 8px 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+
+button {
+    padding: 8px 20px;
+    background: #4a5cff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #2d3ebd;
+}

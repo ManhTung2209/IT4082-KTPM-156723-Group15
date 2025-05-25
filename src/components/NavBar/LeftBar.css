@@ -1,6 +1,6 @@
 .leftbar-container{
     width: 300px;
-    height: 980px;
+    height: 100vh;
     background: white;
     margin: 0;
     padding: 0;
@@ -10,10 +10,10 @@
     position: fixed;
     justify-content: center;
     flex-direction: row;
-    align-items:flex-start;
+    align-items: flex-start;
     border-right: 1px solid #ccc;
+    z-index: 100;
 }
-
 
 .leftbar-container .nav{
     width: 100%;
@@ -43,56 +43,80 @@
 }
 
 .vertical-nav button{
-    width: 180px;
+    width: 230px;
     height: 49px;
-    margin: 16px auto 0 auto;
+    margin: 4px auto 0 auto;
     padding: 16px 32px;
-    display:block;
+    display: block;
     font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
+    background: transparent;
+    border: none;
+    position: relative;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    text-align: center;
+    padding-left: 44px;
 }
 
 .logoutbtn{
     width: 100%;
+    top:100px;
     padding: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 230px !important;
+    margin-top: 150px !important;
     cursor: pointer;
     position: relative;
+    background: transparent;
+    border: none;
+    color: #333 !important;
 }
 
 .logout-icon{
     position: absolute;
-    left:10px;
-    top:7px;
+    left: 10px;
+    top: 17px;
 }
 
-.mainmenubtn{
-    background:#FBD1A6;
-    position: relative;
-}
-
-.statisticbtn,
+.mainmenubtn,
+.feebtn,
+.tollbtn,
 .citizenbtn,
-.householdbtn{
+.householdbtn
+ {
     position: relative;
+    background: transparent;
+    color: #333;
+}
+
+.mainmenubtn.active,
+.feebtn.active,
+.tollbtn.active,
+.citizenbtn.active,
+.householdbtn.active
+{
+    background: #FBD1A6;
+    color: #000;
+    box-shadow: 0 0 8px #FBD1A6;
 }
 
 .mainmenu-icon,
+.collection-icon,
+.fee-icon,
+.toll-icon,
 .citizen-icon,
-.statistic-icon,
 .household-icon{
     position: absolute;
     font-size: 22px;
-    left:10px;
-    top:3.5px;
+    left: 10px;
+    top: 13px;
 }
 
-.vertical-nav button:hover{
-    background: #FBD1A6;
-    box-shadow: 0 0 8px #FBD1A6;
+.vertical-nav button:hover:not(.active){
+    background: #f5e3c0;
+    color: #000;
+    box-shadow: 0 0 8px #f5e3c0;
 }
