@@ -60,19 +60,37 @@
     padding-left: 44px;
 }
 
+.logoutbtn{
+    width: 100%;
+    top:100px;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 150px !important;
+    cursor: pointer;
+    position: relative;
+    background: transparent;
+    border: none;
+    color: #333 !important;
+}
+
+.logout-icon{
+    position: absolute;
+    left: 10px;
+    top: 17px;
+}
+
 .mainmenubtn,
 .feebtn,
 .tollbtn,
 .citizenbtn,
-.householdbtn,
-.logoutbtn
-{
+.householdbtn
+ {
     position: relative;
     background: transparent;
     color: #333;
 }
-
-
 
 .mainmenubtn.active,
 .feebtn.active,
@@ -85,18 +103,16 @@
     box-shadow: 0 0 8px #FBD1A6;
 }
 
-.logout-icon,
 .mainmenu-icon,
 .collection-icon,
 .fee-icon,
 .toll-icon,
 .citizen-icon,
-.household-icon {
+.household-icon{
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     font-size: 22px;
     left: 10px;
+    top: 13px;
 }
 
 .vertical-nav button:hover:not(.active){

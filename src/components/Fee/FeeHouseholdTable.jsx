@@ -1,5 +1,6 @@
 import React from "react";
 
+
 const FeeHouseholdTable = ({ households, type = "fee", config, onBack }) => {
   const columnTitle = "Trạng thái";
   const field =

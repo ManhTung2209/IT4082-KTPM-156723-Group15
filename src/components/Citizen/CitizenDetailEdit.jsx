@@ -23,6 +23,11 @@ const CitizenDetailEdit = ({ citizen }) => {
   };
 
   const handleSave = () => {
+      if(!editedCitizen.name || !editedCitizen.household || !editedCitizen.gender || !editedCitizen.birthYear || !editedCitizen.hometown || !editedCitizen.cccd
+      || !editedCitizen.cccdIssueDate || !editedCitizen.cccdIssuePlace){
+        alert("Vui lòng nhập đầy đủ thông tin");
+        return;
+      }
     // Gọi API lưu thông tin mới ở đây
     setEditMode(false);
     alert("Đã lưu thông tin mới!");

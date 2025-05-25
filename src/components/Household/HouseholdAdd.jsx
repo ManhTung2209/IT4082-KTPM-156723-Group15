@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import HouseholdInfo from "./HouseholdInfo";
 
 const HouseholdAdd = ({ defaultHousehold }) => {
   const [household, setHousehold] = useState({
