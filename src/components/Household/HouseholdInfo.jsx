@@ -28,6 +28,10 @@ const HouseholdInfo = ({ household }) => {
   };
 
   const handleSave = () => {
+    if(!editedHousehold.householdNumber || !editedHousehold.owner){
+      alert("Vui lòng nhập số nhà và chủ hộ");
+      return;
+    }
     setEditMode(false);
     alert("Đã lưu thông tin hộ dân!");
   };

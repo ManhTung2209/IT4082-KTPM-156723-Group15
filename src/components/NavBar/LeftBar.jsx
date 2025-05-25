@@ -4,11 +4,12 @@ import logo from '../../assets/bluemoonlogo.jpg'
 import { FiLogOut, FiUsers } from "react-icons/fi";
 import { GoHome } from "react-icons/go";
 import { PiBuildingApartment } from "react-icons/pi";
+import { MdOutlineFeed } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
 /**
  * @param {Object} props
- * @param {'mainmenu'|'fee'|'toll'|'citizen'|'household'} props.activeMenu
+ * @param {'mainmenu'|'fee'|'charge'|'citizen'|'household'} props.activeMenu
  */
 const LeftBar = ({ activeMenu }) => {
   return (
@@ -27,14 +28,14 @@ const LeftBar = ({ activeMenu }) => {
             <button
               className={`mainmenubtn${activeMenu === 'fee' ? ' active' : ''}`}
             >
-              <GoHome className='mainmenu-icon' />Khoản thu
+              <MdOutlineFeed className='mainmenu-icon' />Khoản thu
             </button>
           </Link>
-          <Link to="/toll" style={{ textDecoration: 'none' }}>
+          <Link to="/charge" style={{ textDecoration: 'none' }}>
             <button
-              className={`mainmenubtn${activeMenu === 'toll' ? ' active' : ''}`}
+              className={`mainmenubtn${activeMenu === 'charge' ? ' active' : ''}`}
             >
-              <GoHome className='mainmenu-icon' />Thu Phí
+              <MdOutlineFeed className='mainmenu-icon' />Thu Phí
             </button>
           </Link>
           <Link to="/citizen" style={{ textDecoration: 'none' }}>
