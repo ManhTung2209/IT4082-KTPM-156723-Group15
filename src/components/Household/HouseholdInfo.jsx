@@ -9,7 +9,6 @@ import CitizenAddModal from "../Citizen/CitizenAddModal"; // Đảm bảo đã c
 const HouseholdInfo = ({ household }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedHousehold, setEditedHousehold] = useState(household);
-
   // Thêm state cho modal chi tiết cư dân
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [citizenModalOpen, setCitizenModalOpen] = useState(false);

@@ -19,6 +19,11 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
     };
 
     const handleAdd = () => {
+        if(!fee.idFee || !fee.feeName || !fee.feeType || !fee.amount || !fee.feeDate
+        || !fee.feeEndDate){
+            alert("Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
         //Gọi API thêm khoản thu ở đây
         alert("Đã thêm khoản thu mới!");
         setFee({
