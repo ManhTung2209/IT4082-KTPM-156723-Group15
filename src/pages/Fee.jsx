@@ -6,6 +6,8 @@ import FeeAddModal from "../components/Fee/FeeAddModal";
 import FeeDetailEditModal from "../components/Fee/FeeDetailEditModal";
 import FeeTable from "../components/Fee/FeeTable";
 import FeeHouseholdTable from "../components/Fee/FeeHouseholdTable";
+import HouseholdInfoModal from   "../components/Household/HouseholdInfoModal";
+
 
 // Giả lập dữ liệu hộ dân và trạng thái nộp phí
 const mockHouseholds = [
@@ -24,7 +26,6 @@ const mockFee = [
     feeDate: "15/05/2025",
     feeEndDate: "31/05/2025",
     description: "",
-    check: "Chi tiết"
   },
   {
     idFee: 2,
@@ -34,7 +35,6 @@ const mockFee = [
     feeDate: "15/05/2025",
     feeEndDate: "31/05/2025",
     description: "Thu theo tháng",
-    check: "Chi tiết"
   },
   {
     idFee: 3,
@@ -44,7 +44,6 @@ const mockFee = [
     feeDate: "14/06/2025",
     feeEndDate: "30/06/2025",
     description: "Tùy tâm",
-    check: "Chi tiết"
   },
   // ...các phần tử còn lại, bổ sung tương tự...
 ];
@@ -55,10 +54,13 @@ const Fee = () => {
   const [fee, setFee] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [modalHousehold, setModalHousehold] = useState(null);
+  const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [selectedHouseholdFee, setSelectedHouseholdFee] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all"); // "all", "paid", "unpaid"
   //State cho Modal
+
   const [selectedFee, setSelectedFee] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -66,20 +68,6 @@ const Fee = () => {
   useEffect(() => {
     setFee(mockFee);
   },[]);
-
-  // const handleAddFee = (newFee) => {
-  //   setFee(prev => {
-  //   // Lấy số lớn nhất hiện tại
-  //     const lastId = prev.length
-  //       ? Math.max(...prev.map(f => Number(f.idFee.replace("KT", ""))))
-  //       : 0;
-  //     const nextId = "KT" + String(lastId + 1).padStart(3, "0");
-  //     return [
-  //       ...prev,
-  //       { ...newFee, idFee: nextId },
-  //     ];
-  //   });
-  // };
 
   const filteredFee = fee.filter(
     f =>
@@ -105,13 +93,6 @@ const Fee = () => {
     setSelectedFee(null);
   };
 
-  // /*Hàm mở modal khi click vào 1 dòng khoản thu bất kỳ*/
-  // const handleRowClick = (fee) => {
-  //   setSelectedFee(fee);
-  //   setModalOpen(true);
-  //   setIsEditMode(true);
-  // };
-
   //Hàm mở modal khi click vào xem chi tiết
   const handleEditFee = (fee) => {
     setSelectedFee(fee);
@@ -120,15 +101,11 @@ const Fee = () => {
     setIsEditMode(true);
   };
 
-  // Lọc danh sách hộ dân theo loại phí
-  // const getHouseholdsForFee = (fee) => {
-  //   if (!fee) return [];
-  //   // Ví dụ: nếu fee.type === "fee" thì lấy trường feePaid, nếu "toll" thì lấy tollPaid
-  //   return mockHouseholds.map(h => ({
-  //     ...h,
-  //     // Có thể xử lý thêm nếu cần
-  //   }));
-  // };
+  const handleClickHousehold = (household) => {
+    setModalHousehold(true);
+    setSelectedHousehold(household);
+  }
+
   const getHouseholdsForFee = (fee) => {
     if (!fee) return [];
     // Ví dụ: nếu fee.type === "fee" thì lấy trường feePaid, nếu "toll" thì lấy tollPaid
@@ -149,7 +126,7 @@ const Fee = () => {
         <div className="content-search">
           <input
             type="text"
-            placeholder="Tìm kiếm theo mã hoặc tên khoản thu..."
+            placeholder="Tìm kiếm..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="content-search-input"
@@ -211,6 +188,7 @@ const Fee = () => {
                 households={getHouseholdsForFee(selectedHouseholdFee)}
                 type={selectedHouseholdFee.type}
                 onBack={() => setSelectedHouseholdFee(null)}
+                onDetailClick={handleClickHousehold}
               />
               <div className="content-pagination">
                 <button
@@ -246,6 +224,12 @@ const Fee = () => {
       <FeeAddModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
+      />
+      <HouseholdInfoModal
+        
+        open={modalHousehold}
+        onClose={() => setModalHousehold(null)}
+        household={selectedHousehold}
       />
     </div>
   );

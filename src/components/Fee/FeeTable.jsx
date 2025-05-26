@@ -34,7 +34,7 @@ const FeeTable = ({ fee, onRowClick, onDetailClick }) => (
                 onDetailClick && onDetailClick(fee);
               }}
               >
-                {fee.check}
+                Chi tiết
               </span>
             </td>
           </tr>

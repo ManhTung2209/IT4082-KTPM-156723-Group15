@@ -1,6 +1,8 @@
 import React, { useState,useEffect } from "react";
 import LeftBar from "../components/NavBar/LeftBar";
 import HeaderBar from "../components/NavBar/HeaderBar";
+import ChargeDetailEditModal from "../components/Charge/ChargeDetailEditModal";
+import ChargeTable from "../components/Charge/ChargeTable";
 import "./Page.css";
 
 // Giả lập dữ liệu các lần nộp tiền
@@ -10,6 +12,7 @@ const mockChargeRecords = [
     householdNumber: 502,
     owner: "Nguyễn Văn A",
     feeName: "Phí vệ sinh",
+    Type: "Bắt buộc",
     amount: 50000,
     paidAt: "2024-05-01",
   },
@@ -18,6 +21,7 @@ const mockChargeRecords = [
     householdNumber: 503,
     owner: "Lê Văn C",
     feeName: "Phí bảo trì",
+    Type: "Bắt buộc",
     amount: 100000,
     paidAt: "2024-05-02",
   },
@@ -26,7 +30,9 @@ const mockChargeRecords = [
 const PAGE_SIZE = 10;
 
 const Charge = () => {
-  const [records, setRecords] = useState(mockChargeRecords);
+  const [charge, setCharge] = useState(mockChargeRecords);
+  const [selectedCharge, setSelectedCharge] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     householdNumber: "",
@@ -39,11 +45,13 @@ const Charge = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  // Hàm mở modal khi click vào dòng
+  const handleRowClick = (charge) => {
+    setSelectedCharge(charge);
+    setModalOpen(true);
+  };
+
   const handleChange = e => {
-    if (!form.householdNumber || !form.owner || !form.feeName || !form.amount || !form.paidAt){
-      alert("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -52,11 +60,11 @@ const Charge = () => {
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-    setRecords([
-      ...records,
+    setCharge([
+      ...charge,
       {
         ...form,
-        id: records.length + 1,
+        id: charge.length + 1,
       },
     ]);
     setShowForm(false);
@@ -68,18 +76,21 @@ const Charge = () => {
       paidAt: "",
     });
   };
+  
+  useEffect(() => {
+    setCharge(mockChargeRecords);
+  }, []);
 
   // Lọc theo từ khóa tìm kiếm
-  const filteredRecords = records.filter(r =>
+  const filteredRecords = charge.filter(r =>
     r.householdNumber.toString().includes(search) ||
     r.owner.toLowerCase().includes(search.toLowerCase()) ||
     r.feeName.toLowerCase().includes(search.toLowerCase()) ||
-    (r.paidAt && r.paidAt.includes(search))
+    r.paidAt && r.paidAt.includes(search)
   );
   
-  
   // Tính tổng số trang
-const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
   // Lấy dữ liệu trang hiện tại
   const pagedRecords = filteredRecords.slice(
     (page - 1) * PAGE_SIZE,
@@ -89,29 +100,29 @@ const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
   // Reset về trang 1 khi thêm mới hoặc records thay đổi
   React.useEffect(() => {
     setPage(1);
-  }, [records]);
+  }, [charge]);
 
   return (
     <div>
       <LeftBar activeMenu="charge" />
       <HeaderBar title="Thu Phí" />
       <div className="content-container">
-        <h2 className="content-title">Thống kê các lần nộp tiền</h2>
+        <h2 className="content-title">Quản lý thu phí</h2>
         <div className="content-search">
           <input
             type="text"
-            placeholder="Tìm kiếm "
+            placeholder="Tìm kiếm..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="content-search-input"
           />
         </div>
-        <button onClick={() => setShowForm(true)} style={{ marginBottom: 16 }}>
-          Ghi nhận lần nộp mới
+        <button onClick={() => setShowForm(true)} style={{ marginBottom: 16, background:"#1890ff" }}>
+          + Tạo phiếu nộp mới
         </button>
         {showForm && (
           <div style={{ marginBottom: 24, border: "1px solid #ccc", padding: 17 }}>
-            <h3>Ghi nhận lần nộp mới</h3>
+            <h3>Phiếu nộp phí</h3>
             <input
               name="householdNumber"
               placeholder="Mã hộ dân"
@@ -151,36 +162,12 @@ const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
           </div>
         )}
         <div className="content">
-        <table className="content-table">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Mã hộ dân</th>
-              <th>Chủ hộ</th>
-              <th>Tên khoản thu</th>
-              <th>Số tiền</th>
-              <th>Ngày nộp</th>
-            </tr>
-          </thead>
-          <tbody>
-          {pagedRecords.length === 0 ? (
-            <tr>
-              <td colSpan={6} style={{ textAlign: "center" }}>Không có dữ liệu</td>
-            </tr>
-          ) : (
-            pagedRecords.map((r, idx) => (
-              <tr key={r.id}>
-                <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
-                <td>{r.householdNumber}</td>
-                <td>{r.owner}</td>
-                <td>{r.feeName}</td>
-                <td>{Number(r.amount).toLocaleString()} đ</td>
-                <td>{r.paidAt}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-        </table>
+          <ChargeTable
+            charge={pagedRecords}
+            onRowClick={handleRowClick}
+            page = {page}
+            page_size={PAGE_SIZE}
+          />
         <div className="content-pagination">
         <button
           onClick={() => setPage(page - 1)}
@@ -202,6 +189,11 @@ const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE);
       </div>
       </div>
       </div>
+      <ChargeDetailEditModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        charge={selectedCharge}
+      />
     </div>
   );
 };

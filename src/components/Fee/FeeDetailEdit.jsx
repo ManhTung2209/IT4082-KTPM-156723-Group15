@@ -18,6 +18,11 @@ const FeeDetailEdit = ({ fee }) => {
   };
 
   const handleSave = () => {
+    if(!editedFee.idFee || !editedFee.feeName || !editedFee.feeType || !editedFee.amount || !editedFee.feeDate
+    || !editedFee.feeEndDate){
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
     // Gọi API lưu thông tin mới ở đây
     setEditMode(false);
     alert("Đã lưu thông tin mới!");

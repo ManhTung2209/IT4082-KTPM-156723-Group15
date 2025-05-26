@@ -96,7 +96,7 @@ const Citizen = () => {
         <div className="content-search">
           <input
             type="text"
-            placeholder="Tìm kiếm"
+            placeholder="Tìm kiếm..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="content-search-input"
