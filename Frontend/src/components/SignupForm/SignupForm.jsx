@@ -8,16 +8,20 @@ import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rePassword, setRePassword] = useState('');
+  const [role, setRole] = useState(''); 
   const [unitCode, setUnitCode] = useState('');
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const validateEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
 
@@ -37,8 +41,33 @@ const SignupForm = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      alert('Đăng ký thành công!');
-      navigate('/login');
+      setLoading(true);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/users/register/", {
+          method: "POST",
+          headers: {
+          'Content-Type': 'application/json',
+        },
+          body: JSON.stringify({
+            username,
+            email,
+            role,
+            unit_code: unitCode,
+            password,
+          })
+        });
+        if (res.ok) {
+          alert('Đăng ký thành công!');
+          navigate('/login');
+        } else {
+          const data = await res.json();
+          alert(data.detail || "Đăng ký thất bại!");
+        }
+      } catch (errors) {
+        alert("ERRORS " + errors.message);
+        console.error("Error during registration:", errors);
+      }
+      setLoading(false);
     }
   };
 
@@ -47,6 +76,16 @@ const SignupForm = () => {
       <div className="signup-wrapper">
         <form onSubmit={handleSubmit}>
           <h1>Đăng ký</h1>
+          <div className="email-signup">
+            <input
+              type = "email"
+              placeholder='Email'
+              value = {email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+            {errors.email && <div className='error'>{errors.email}</div>}
+          </div>
           <div className="signup-input-box">
             <input
               type="text"
@@ -81,6 +120,17 @@ const SignupForm = () => {
             />
             <FaLock className='icon'/>
             {errors.rePassword && <div className="error">{errors.rePassword}</div>}
+          </div>
+          <div className="role-input-box">
+            <input
+              type="text"
+              placeholder="Nhập vai trò"
+              value={role}
+              onChange={e => setRole(e.target.value)}
+              required
+            />
+            <FaLock className='icon'/>
+            {errors.role && <div className="error">{errors.role}</div>}
           </div>
             <h6>Chú ý: Mật khẩu nhập lại phải khớp</h6>
           <div className="signup-input-box">
