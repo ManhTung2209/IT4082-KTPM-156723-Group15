@@ -14,13 +14,11 @@ const ForgotPassword = () => {
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
-    const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         let newErrors = {};
 
-        if(!validateEmail(username)) {
+        if( username.trim() === '') {
             newErrors.username = 'Tên tài khoản phải có dạng user@domain';
         }
         if (newPassword.length < 8) {
@@ -36,32 +34,28 @@ const ForgotPassword = () => {
         setErrors(newErrors);
 
         if(Object.keys(newErrors).length === 0) {
-            try {
-                const res = await fetch("http://127.0.0.1:8000/users/{1}/change-password/", {
-                    method: "POST",
-                    headers: { 'Content-Type': "application/json" },
-                    body: JSON.stringify({
-                        username,
-                        newPassword: newPassword,
-                        rePassword: rePassword,
-                        unitCode: unitCode,
-                    })
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if(data.success) {
-                        alert('Đổi mật khẩu thành công!');
-                        navigate('/login');
-                    }
-                } else {
-                    const data = await res.json();
-                    alert(data.detail || "Đổi mật khẩu thất bại!");
-                }
-            } catch (errors) {
-                alert("ERRORS " + errors.message);
-                console.error("Error during registration:", errors);
-            }
+    try {
+        const res = await fetch("http://127.0.0.1:8000/users/forgot-password/", {
+            method: "POST",
+            headers: { 'Content-Type': "application/json" },
+            body: JSON.stringify({
+                username,
+                unit_code: unitCode,
+                new_password: newPassword
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(data.detail || 'Đổi mật khẩu thành công!');
+            navigate('/login');
+        } else {
+            alert(data.detail || "Đổi mật khẩu thất bại!");
         }
+    } catch (errors) {
+        alert("ERRORS " + errors.message);
+        console.error("Error during forgot password:", errors);
+    }
+}
     };
 
     return (

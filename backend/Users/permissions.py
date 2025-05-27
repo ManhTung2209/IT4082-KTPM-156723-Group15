@@ -5,7 +5,7 @@ class UserPermission(permissions.BasePermission):
         if request.method == 'GET':
             return request.user.role in ['manager', 'deputy', 'accountant']
         if request.method in ['POST', 'PUT', 'PATCH']:
-            return request.user.is_authenticated and request.user.role == 'manager'
+             return request.user.role in ['manager', 'deputy', 'accountant']
         if request.method == 'DELETE':
             return request.user.is_authenticated and request.user.role == 'manager'
         return False

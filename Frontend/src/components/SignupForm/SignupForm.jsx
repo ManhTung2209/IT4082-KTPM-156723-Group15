@@ -26,8 +26,11 @@ const SignupForm = () => {
     e.preventDefault();
     let newErrors = {};
 
-    if (!validateEmail(username)) {
+    if (!validateEmail(email)) {
       newErrors.username = 'Tên tài khoản phải có dạng user@domain';
+    }
+    if (username.trim() === '') {
+      newErrors.username = 'Tên tài khoản không được để trống';
     }
     if (password.length < 8) {
       newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
@@ -88,6 +91,7 @@ const SignupForm = () => {
             <MdEmail className='icon' />
             {errors.email && <div className='error'>{errors.email}</div>}
           </div>
+          <h6>Chú ý: Email phải có dạng user@domain</h6>
           <div className="signup-input-box">
             <input
               type="text"
@@ -99,7 +103,7 @@ const SignupForm = () => {
             <FaUser className='icon' />
             {errors.username && <div className="error">{errors.username}</div>}
           </div>
-            <h6>Chú ý: Tên tài khoản phải có dạng user@domain</h6>
+            <h6>Chú ý: Tên tài khoản không được bỏ trống</h6>
           <div className="signup-input-box">
             <input
               type="password"
@@ -123,6 +127,7 @@ const SignupForm = () => {
             <FaLock className='icon'/>
             {errors.rePassword && <div className="error">{errors.rePassword}</div>}
           </div>
+          <h6>Chú ý: Mật khẩu nhập lại phải khớp</h6>
           <div className="role-input-box">
             <select 
               value={role}
@@ -136,7 +141,7 @@ const SignupForm = () => {
             </select>
             {errors.role && <div className="error">{errors.role}</div>}
           </div>
-            <h6>Chú ý: Mật khẩu nhập lại phải khớp</h6>
+          <h6>Chú ý: Chọn đúng vai trò</h6>
           <div className="signup-input-box">
             <input
               type="password"
