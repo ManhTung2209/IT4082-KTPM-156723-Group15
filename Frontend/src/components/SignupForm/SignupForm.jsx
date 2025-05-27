@@ -5,6 +5,7 @@ import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import { SiLastpass } from "react-icons/si";
 import { useNavigate } from 'react-router-dom';
+import { MdEmail } from "react-icons/md";
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');
@@ -76,7 +77,7 @@ const SignupForm = () => {
       <div className="signup-wrapper">
         <form onSubmit={handleSubmit}>
           <h1>Đăng ký</h1>
-          <div className="email-signup">
+          <div className="signup-input-box">
             <input
               type = "email"
               placeholder='Email'
@@ -84,6 +85,7 @@ const SignupForm = () => {
               onChange={e => setEmail(e.target.value)}
               required
             />
+            <MdEmail className='icon' />
             {errors.email && <div className='error'>{errors.email}</div>}
           </div>
           <div className="signup-input-box">
@@ -122,14 +124,16 @@ const SignupForm = () => {
             {errors.rePassword && <div className="error">{errors.rePassword}</div>}
           </div>
           <div className="role-input-box">
-            <input
-              type="text"
-              placeholder="Nhập vai trò"
+            <select 
               value={role}
               onChange={e => setRole(e.target.value)}
               required
-            />
-            <FaLock className='icon'/>
+            >
+              <option value="" disabled>Chọn vai trò</option>
+              <option className='role-option' value="manager">Tổ trưởng</option>
+              <option className='role-option' value="deputy">Tổ phó</option>
+              <option className='role-option' value="accountant">Kế toán</option>
+            </select>
             {errors.role && <div className="error">{errors.role}</div>}
           </div>
             <h6>Chú ý: Mật khẩu nhập lại phải khớp</h6>

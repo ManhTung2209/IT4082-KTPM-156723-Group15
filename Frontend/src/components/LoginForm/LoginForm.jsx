@@ -8,6 +8,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [id, setId] = useState('');
   const [remember, setRemember] = useState(false);
 
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const LoginForm = () => {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateEmail(username)) {
       setError('Tài khoản phải có dạng user@domain');
@@ -36,13 +37,40 @@ const LoginForm = () => {
       return;
     }
     setError('');
-    alert('Đăng nhập thành công!');
-    if (remember) {
-      localStorage.setItem('rememberMe', JSON.stringify({ username, password }));
-    } else {
-      localStorage.removeItem('rememberMe');
+    try{
+      const res = await fetch("http://127.0.0.1:8000/users/login/", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        })
+      });
+      if(res.ok) {
+        const data = await res.json();
+        if(data.token){
+          localStorage.setItem('token', data.token);
+        }
+        if(remember){
+          localStorage.setItem('rememberMe', JSON.stringify({ username, password }));
+        }
+        if(id){
+          localStorage.setItem('userId', data.id);
+        } else {
+          localStorage.removeItem('rememberMe');
+        }
+        alert('Đăng nhập thành công!');
+        navigate('/');
+      } else{
+        const data = await res.json();
+        alert(data.detail || "Đăng nhập thất bại!");
+      }
+    } catch (error) {
+        alert("ERRORS " + error.message);
+        console.error("Error during registration:", error);
     }
-    navigate('/');
   };
 
   return (

@@ -15,7 +15,7 @@ const ChangePassword = () => {
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
 
@@ -38,8 +38,33 @@ const ChangePassword = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      alert('Đổi mật khẩu thành công!');
-      navigate(-1); // Quay lại trang trước đó
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        const res = await fetch(`http://127.0.0.1:8000/users/${userId}/change-password/`, {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+           },
+          body: JSON.stringify({
+            username,
+            oldPassword,
+            newPassword,
+            rePassword,
+            unit_Code: unitCode,
+          })
+        });
+        if(res.ok) {
+          alert('Đổi mật khẩu thành công!');
+          navigate('/login');
+        } else{
+          const data = await res.json();
+          alert(data.detail || "Đổi mật khẩu thất bại!");
+        }
+      } catch (errors) {
+        alert("ERRORS " + errors.message);
+        console.error("Error during registration:", errors);
+      }
     }
   };
 

@@ -16,7 +16,7 @@ const ForgotPassword = () => {
 
     const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         let newErrors = {};
 
@@ -36,8 +36,31 @@ const ForgotPassword = () => {
         setErrors(newErrors);
 
         if(Object.keys(newErrors).length === 0) {
-            alert('Đổi mật khẩu thành công!');
-            navigate('/login');
+            try {
+                const res = await fetch("http://127.0.0.1:8000/users/{1}/change-password/", {
+                    method: "POST",
+                    headers: { 'Content-Type': "application/json" },
+                    body: JSON.stringify({
+                        username,
+                        newPassword: newPassword,
+                        rePassword: rePassword,
+                        unitCode: unitCode,
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if(data.success) {
+                        alert('Đổi mật khẩu thành công!');
+                        navigate('/login');
+                    }
+                } else {
+                    const data = await res.json();
+                    alert(data.detail || "Đổi mật khẩu thất bại!");
+                }
+            } catch (errors) {
+                alert("ERRORS " + errors.message);
+                console.error("Error during registration:", errors);
+            }
         }
     };
 
@@ -95,6 +118,7 @@ const ForgotPassword = () => {
                             {errors.unitCode && <div className="error">{errors.unitCode}</div>}
                         </div>
                         <h6>Chú ý: Nhập cả chữ và số VD:AA1234</h6>
+                        <button type = "submit" className='forgotpass-btn'>Đổi mật khẩu</button>
                         <div className="login-link">
                             <p>Quay lại trang <Link to="/login">Đăng nhập</Link></p>
                         </div>
