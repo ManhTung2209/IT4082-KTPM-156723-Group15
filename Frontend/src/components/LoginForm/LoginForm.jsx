@@ -22,14 +22,10 @@ const LoginForm = () => {
     }
   }, []);
 
-  const validateEmail = (email) => {
-    return /\S+@\S+\.\S+/.test(email);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateEmail(username)) {
-      setError('Tài khoản phải có dạng user@domain');
+    if (!username.trim()) {
+      setError('Tài khoản không được bỏ trống');
       return;
     }
     if (password.length < 8) {
@@ -49,24 +45,24 @@ const LoginForm = () => {
         })
       });
       if(res.ok) {
-        const data = await res.json();
-        if(data.token){
-          localStorage.setItem('token', data.token);
-        }
-        if(remember){
-          localStorage.setItem('rememberMe', JSON.stringify({ username, password }));
-        }
-        if(id){
-          localStorage.setItem('userId', data.id);
-        } else {
-          localStorage.removeItem('rememberMe');
-        }
-        alert('Đăng nhập thành công!');
-        navigate('/');
-      } else{
-        const data = await res.json();
-        alert(data.detail || "Đăng nhập thất bại!");
-      }
+  const data = await res.json();
+  if(data.access){
+    localStorage.setItem('token', data.access); // Lưu access token
+  }
+  if(data.user && data.user.id){
+    localStorage.setItem('userId', data.user.id);
+  }
+  if(remember){
+    localStorage.setItem('rememberMe', JSON.stringify({ username, password }));
+  } else {
+    localStorage.removeItem('rememberMe');
+  }
+  alert('Đăng nhập thành công!');
+  navigate('/');
+} else {
+  const data = await res.json();
+  alert(data.detail || "Đăng nhập thất bại!");
+}
     } catch (error) {
         alert("ERRORS " + error.message);
         console.error("Error during registration:", error);

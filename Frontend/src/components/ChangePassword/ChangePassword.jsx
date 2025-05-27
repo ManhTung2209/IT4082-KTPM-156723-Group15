@@ -13,13 +13,11 @@ const ChangePassword = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
 
-    if (!validateEmail(username)) {
+    if (username.trim() === '') {
       newErrors.username = 'Tên tài khoản phải có dạng user@domain';
     }
     if (oldPassword.length < 8) {
@@ -38,34 +36,35 @@ const ChangePassword = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      try {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('userId');
-        const res = await fetch(`http://127.0.0.1:8000/users/${userId}/change-password/`, {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-           },
-          body: JSON.stringify({
-            username,
-            oldPassword,
-            newPassword,
-            rePassword,
-            unit_Code: unitCode,
-          })
-        });
-        if(res.ok) {
-          alert('Đổi mật khẩu thành công!');
-          navigate('/login');
-        } else{
-          const data = await res.json();
-          alert(data.detail || "Đổi mật khẩu thất bại!");
-        }
-      } catch (errors) {
-        alert("ERRORS " + errors.message);
-        console.error("Error during registration:", errors);
-      }
+  try {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId'); // Lấy userId đã lưu khi đăng nhập
+    const res = await fetch(`http://127.0.0.1:8000/users/${userId}/change-password/`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username,
+        old_password: oldPassword,
+        new_password: newPassword,
+        re_password: rePassword,
+        unit_code: unitCode,
+      })
+    });
+    if(res.ok) {
+      alert('Đổi mật khẩu thành công!');
+      navigate('/login');
+    } else{
+      const data = await res.json();
+      alert(data.detail || "Đổi mật khẩu thất bại!");
     }
+  } catch (errors) {
+    alert("ERRORS " + errors.message);
+    console.error("Error during registration:", errors);
+  }
+}
   };
 
   return (
@@ -134,7 +133,7 @@ const ChangePassword = () => {
               {errors.unitCode && <div className="error">{errors.unitCode}</div>}
             </div>
             <h6>Chú ý: Nhập cả chữ và số VD:AA1234</h6>
-            <button type="submit">Đổi mật khẩu</button>
+            <button className='changepasswordbtn' type="submit">Đổi mật khẩu</button>
             <button
               type="button"
               style={{ marginTop: 10, background: "#888" }}
