@@ -1,0 +1,119 @@
+.content-container {
+    width: 1190px;
+    min-height: 630px;
+    margin-left: 300px;
+    margin-top: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-title {
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.content-search {
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.content-search-input {
+    width: 320px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: 1.5px solid #ccc;
+    font-size: 15px;
+}
+
+.content-container input {
+    padding: 7px 10px;
+    border: 1.5px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 210px;
+    margin-left: 0px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.content {
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    background-color: #fafbfc;
+    margin-top: 16px;
+    overflow: auto;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.content-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #eee;
+    border-collapse: collapse;
+}
+
+.content-table th,
+.content-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.content-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+.content-table-empty {
+    text-align: center;
+    padding: 24px;
+    color: #888;
+}
+
+.content-pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagination-btn {
+    padding: 6px 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pagination-btn:disabled {
+    background: #eee;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-weight: 600;
+}
+
+.content-table tbody tr:hover {
+    background: #f5f5f5;
+    transition: background 0.2s;
+    cursor: pointer;
+}
