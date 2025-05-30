@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Contribution
+from .models import Contribution, ContributionStatus
 from Collections.models import Collection
 from HouseHold_Resident.models import Household
 
@@ -51,7 +51,14 @@ class ContributionSerializer(serializers.ModelSerializer):
             validated_data['code'] = collection
         return super().update(instance, validated_data)
 
-class ContributionStatusSerializer(serializers.Serializer):
-    household_id = serializers.IntegerField()
-    code = serializers.CharField()
-    status = serializers.CharField()
+class ContributionStatusSerializer(serializers.ModelSerializer):
+    household_id = serializers.IntegerField(source='household.household_id')
+    block_name = serializers.CharField(source='household.block_name', required=False, allow_null=True)
+    room_number = serializers.CharField(source='household.room_number', required=False, allow_null=True)
+    owner_name = serializers.CharField(source='household.owner_name', required=False, allow_null=True)
+    code = serializers.CharField(source='code.code')
+    collection_name = serializers.CharField(source='code.name', required=False, allow_null=True)
+
+    class Meta:
+        model = ContributionStatus
+        fields = ['household_id', 'block_name', 'room_number', 'owner_name', 'code', 'collection_name', 'status']

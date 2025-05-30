@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Contribution
+from .models import Contribution, ContributionStatus
 from .serializers import ContributionSerializer, ContributionStatusSerializer
 from Collections.models import Collection
 from HouseHold_Resident.models import Household
@@ -18,18 +18,17 @@ def contribution_create(request):
     serializer = ContributionSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        status_data = {
-            'household_id': contribution.household.household_id,
-            'code': contribution.code.code,
-            'status': 'PAID'
-        }
-        status_serializer = ContributionStatusSerializer(data=status_data)
-        if status_serializer.is_valid():
-            return Response(
-                {"message": "Tạo khoản nộp thành công!", "data": serializer.data, "status": status_serializer.data},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Cập nhật hoặc tạo ContributionStatus
+        status_instance, created = ContributionStatus.objects.update_or_create(
+            household=contribution.household,
+            code=contribution.code,
+            defaults={'status': 'ĐÃ NỘP'}
+        )
+        status_serializer = ContributionStatusSerializer(status_instance)
+        return Response(
+            {"message": "Tạo khoản nộp thành công!", "data": serializer.data, "status": status_serializer.data},
+            status=status.HTTP_201_CREATED
+        )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -55,7 +54,6 @@ def contribution_list(request):
     serializer = ContributionSerializer(contributions, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def contribution_detail(request, pk):
@@ -64,18 +62,22 @@ def contribution_detail(request, pk):
     """
     contribution = get_object_or_404(Contribution, pk=pk)
     serializer = ContributionSerializer(contribution)
+    status_instance = ContributionStatus.objects.filter(
+        household=contribution.household, code=contribution.code
+    ).first()
     status_data = {
         'household_id': contribution.household.household_id,
+        'block_name': contribution.household.block_name,
+        'room_number': contribution.household.room_number,
+        'owner_name': contribution.household.owner_name,
         'code': contribution.code.code,
-        'status': 'PAID'
-    }
-    status_serializer = ContributionStatusSerializer(data=status_data)
-    if status_serializer.is_valid():
-        return Response(
-            {"data": serializer.data, "status": status_serializer.data},
-            status=status.HTTP_200_OK
-        )
-    return Response(status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        'collection_name': getattr(contribution.code, 'name', contribution.code.code),
+        'status': 'ĐÃ NỘP'
+    } if not status_instance else ContributionStatusSerializer(status_instance).data
+    return Response(
+        {"data": serializer.data, "status": status_data},
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -90,18 +92,17 @@ def contribution_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=False, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        status_data = {
-            'household_id': contribution.household.household_id,
-            'code': contribution.code.code,
-            'status': 'PAID'
-        }
-        status_serializer = ContributionStatusSerializer(data=status_data)
-        if status_serializer.is_valid():
-            return Response(
-                {"message": "Cập nhật thành công!", "data": serializer.data, "status": status_serializer.data},
-                status=status.HTTP_200_OK
-            )
-        return Response(status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Cập nhật ContributionStatus
+        status_instance, created = ContributionStatus.objects.update_or_create(
+            household=contribution.household,
+            code=contribution.code,
+            defaults={'status': 'ĐÃ NỘP'}
+        )
+        status_serializer = ContributionStatusSerializer(status_instance)
+        return Response(
+            {"message": "Cập nhật thành công!", "data": serializer.data, "status": status_serializer.data},
+            status=status.HTTP_200_OK
+        )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PATCH'])
@@ -117,18 +118,17 @@ def contribution_partial_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=True, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        status_data = {
-            'household_id': contribution.household.household_id,
-            'code': contribution.code.code,
-            'status': 'PAID'
-        }
-        status_serializer = ContributionStatusSerializer(data=status_data)
-        if status_serializer.is_valid():
-            return Response(
-                {"message": "Cập nhật thành công!", "data": serializer.data, "status": status_serializer.data},
-                status=status.HTTP_200_OK
-            )
-        return Response(status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Cập nhật ContributionStatus
+        status_instance, created = ContributionStatus.objects.update_or_create(
+            household=contribution.household,
+            code=contribution.code,
+            defaults={'status': 'ĐÃ NỘP'}
+        )
+        status_serializer = ContributionStatusSerializer(status_instance)
+        return Response(
+            {"message": "Cập nhật thành công!", "data": serializer.data, "status": status_serializer.data},
+            status=status.HTTP_200_OK
+        )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
@@ -140,19 +140,18 @@ def contribution_delete(request, pk):
     contribution = get_object_or_404(Contribution, pk=pk)
     if contribution.is_reconciled:
         return Response({"message": "Khoản nộp đã được thống kê, không thể xóa!"}, status=status.HTTP_403_FORBIDDEN)
-    status_data = {
-        'household_id': contribution.household.household_id,
-        'code': contribution.code.code,
-        'status': 'UNPAID'
-    }
+    # Cập nhật ContributionStatus thành CHƯA NỘP
+    status_instance, created = ContributionStatus.objects.update_or_create(
+        household=contribution.household,
+        code=contribution.code,
+        defaults={'status': 'CHƯA NỘP'}
+    )
     contribution.delete()
-    status_serializer = ContributionStatusSerializer(data=status_data)
-    if status_serializer.is_valid():
-        return Response(
-            {"message": "Xóa thành công!", "status": status_serializer.data},
-            status=status.HTTP_200_OK
-        )
-    return Response(status_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    status_serializer = ContributionStatusSerializer(status_instance)
+    return Response(
+        {"message": "Xóa thành công!", "status": status_serializer.data},
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -160,25 +159,16 @@ def contribution_status_check(request):
     """
     GET: Hiển thị trạng thái nộp của tất cả hộ gia đình cho tất cả khoản thu
     """
-    # Lấy tất cả hộ gia đình và khoản thu
-    households = Household.objects.all()
-    collections = Collection.objects.all()
+    # Lấy query params để lọc
+    room_number = request.query_params.get('room_number')
+    code = request.query_params.get('code')
 
-    # Tạo danh sách trạng thái cho tất cả cặp household-collection
-    status_list = []
-    for household in households:
-        for collection in collections:
-            contribution = Contribution.objects.filter(
-                household=household,
-                code=collection
-            ).first()
-            status_data = {
-                'household_id': household.household_id,
-                'code': collection.code,
-                'status': 'PAID' if contribution else 'UNPAID'
-            }
-            status_list.append(status_data)
+    # Lọc ContributionStatus
+    status_qs = ContributionStatus.objects.select_related('household', 'code').all()
+    if room_number:
+        status_qs = status_qs.filter(household__room_number=room_number)
+    if code:
+        status_qs = status_qs.filter(code__code=code)
 
-    # Serialize danh sách trạng thái
-    serializer = ContributionStatusSerializer(status_list, many=True)
+    serializer = ContributionStatusSerializer(status_qs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
