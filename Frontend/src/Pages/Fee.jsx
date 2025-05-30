@@ -65,14 +65,35 @@ const Fee = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
 
+  const fetchFees = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://127.0.0.1:8000/collections/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data =await res.json();
+        setFee(data);
+      } else {
+        setFee([]);
+      }
+    } catch (errors) {
+      setFee([]);
+    }
+  };
+
   useEffect(() => {
-    setFee(mockFee);
+    fetchFees();
   },[]);
 
   const filteredFee = fee.filter(
     f =>
-      f.feeName.toLowerCase().includes(search.toLowerCase()) ||
-      f.feeType.toLowerCase().includes(search.toLowerCase()) ||
+      f.name.toLowerCase().includes(search.toLowerCase()) ||
+      f.type.toLowerCase().includes(search.toLowerCase()) ||
       f.description.toLowerCase().includes(search.toLowerCase()) ||
       f.amount.toString().includes(search)
   );
@@ -224,6 +245,7 @@ const Fee = () => {
       <FeeAddModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
+        onSuccess = {fetchFees}
       />
       <HouseholdInfoModal
         

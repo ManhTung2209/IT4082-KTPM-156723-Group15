@@ -14,7 +14,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DashBoard />} />
+        <Route path="/" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/change-password" element={<ChangePassword />} />
@@ -24,7 +24,7 @@ function App() {
         <Route path="/fee" element={<Fee />} />
         <Route path="/charge" element={<Charge />} />
         <Route path="/homepage" element={<DashBoard />} />
-        <Route path="*" element={<Home />} />
+        <Route path="*" element={<LoginForm />} />
       </Routes>
     </Router>
   );

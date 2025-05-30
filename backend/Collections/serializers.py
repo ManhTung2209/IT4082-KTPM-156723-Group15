@@ -7,7 +7,8 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['collection_id', 'code', 'name', 'type', 'amount', 'unit_code', 'recorded_by']
+        fields = ['collection_id', 'code', 'name', 'type', 'amount', 'unit_code', 'recorded_by',
+                  'feeDate', 'feeEndDate', 'description']
         read_only_fields = ['collection_id', 'unit_code', 'recorded_by']
 
     def validate(self, data):

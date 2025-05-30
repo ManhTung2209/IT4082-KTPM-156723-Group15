@@ -4,10 +4,11 @@ import FeeInfo from "./FeeInfo";
 import "./FeeInfo.css";
 
 const FeeAddModal = ({ open, onClose, defaultFee }) => {
+    // const [errors, setErrors] = useState({});
     const [fee, setFee] = useState({
-        idFee:"",
-        feeName: "",
-        feeType: "",
+        code:"",
+        name: "",
+        type: "",
         amount: defaultFee || "",
         feeDate:"",
         feeEndDate: "",
@@ -18,23 +19,51 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
         setFee({ ...fee, [e.target.name]: e.target.value });
     };
 
-    const handleAdd = () => {
-        if(!fee.idFee || !fee.feeName || !fee.feeType || !fee.amount || !fee.feeDate
+    const handleAdd = async () => {
+        if(!fee.code || !fee.name || !fee.type || !fee.amount || !fee.feeDate
         || !fee.feeEndDate){
             alert("Vui lòng nhập đầy đủ thông tin");
             return;
         }
-        //Gọi API thêm khoản thu ở đây
-        alert("Đã thêm khoản thu mới!");
-        setFee({
-            idFee:"",
-            feeName: "",
-            feeType: "",
-            amount: defaultFee || "",
-            feeDate: "",
-            description: "",
-        });
-        onClose();
+        try{
+            const token = localStorage.getItem('token');
+            const res = await fetch("http://127.0.0.1:8000/collections/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    code: fee.code,
+                    name: fee.name,
+                    type: fee.type,
+                    amount: fee.amount,
+                    feeDate: fee.feeDate || null,
+                    feeEndDate: fee.feeEndDate || null,
+                    description: fee.description,
+                })
+            });
+            if (res.ok) {
+                alert("Đã thêm khoản thu mới!");
+                if (typeof onSuccess === "function") onSuccess();
+                setFee({
+                    code: "",
+                    name: "",
+                    type: "",
+                    amount: "",
+                    feeDate:"",
+                    feeEndDate: "",
+                    description: "",
+                });
+                onClose();
+            } else {
+                const data = await res.json();
+                alert(data.detail || "Thêm khoản thu thất bại!");
+            }
+        } catch (errors) {
+            alert("ERRORS " + errors.message);
+            console.error("Error during registration:", errors);
+        }
     };
 
     return (
@@ -44,15 +73,15 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
                 <div className="info-grid">
                 <div>
                     <label>Mã khoản thu: </label>
-                    <input name="idFee" value={fee.idFee} onChange={handleChange}/>
+                    <input name="code" value={fee.code} onChange={handleChange}/>
                 </div>
                 <div>
                     <label>Tên khoản thu: </label>
-                    <input name="feeName" value={fee.feeName} onChange={handleChange}/>
+                    <input name="name" value={fee.name} onChange={handleChange}/>
                 </div>
                 <div>
                     <label>Loại khoản thu: </label>
-                    <select name="feeType" value={fee.feeType} onChange={handleChange}>
+                    <select name="type" value={fee.type} onChange={handleChange}>
                         <option value="Bắt buộc">Bắt buộc</option>
                         <option value="Tự nguyện">Tự nguyện</option>
                     </select>
@@ -64,6 +93,10 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
                 <div>
                     <label>Ngày tạo: </label>
                     <input name="feeDate" value={fee.feeDate} onChange={handleChange}/>
+                </div>
+                <div>
+                    <label>Ngày hết hạn: </label>
+                    <input name="feeEndDate" value={fee.feeEndDate} onChange={handleChange}/>
                 </div>
                 <div>
                     <label>Ghi chú: </label>

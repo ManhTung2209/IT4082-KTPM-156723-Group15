@@ -12,27 +12,6 @@ from .serializers import CustomUserSerializer, UserRegistrationSerializer, Login
 from .permissions import UserPermission
 from django.contrib.auth import update_session_auth_hash
 
-class ChangeUnitCodeView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        user = request.user
-        new_unit_code = request.data.get('new_unit_code')
-        if user.role != 'manager':
-            return Response({'detail': 'Chỉ tổ trưởng mới được đổi mã đơn vị.'}, status=status.HTTP_403_FORBIDDEN)
-        if not new_unit_code:
-            return Response({'detail': 'Vui lòng nhập mã đơn vị mới.'}, status=status.HTTP_400_BAD_REQUEST)
-        if User.objects.filter(unit_code=new_unit_code, role='manager').exclude(pk=user.pk).exists():
-            return Response({'detail': 'Mã đơn vị này đã có tổ trưởng khác.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        old_unit_code = user.unit_code
-        # Đổi mã đơn vị cho manager
-        user.unit_code = new_unit_code
-        user.save()
-        # Đổi mã đơn vị cho tất cả user cùng tổ (trừ manager)
-        User.objects.filter(unit_code=old_unit_code).exclude(pk=user.pk).update(unit_code=new_unit_code)
-        return Response({'detail': 'Đổi mã đơn vị thành công.'}, status=status.HTTP_200_OK)
-
 class UserInfoView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CustomUserSerializer
@@ -177,45 +156,18 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='change-password')
     def change_password(self, request, pk=None):
         user = self.get_object()
-        username = request.data.get('username')
-        old_password = request.data.get('old_password')
-        new_password = request.data.get('new_password')
+        if request.user.role != 'manager':
+            return Response({"detail": "Chỉ tổ trưởng được đổi mật khẩu"}, status=403)
+        if user.manager != request.user and user != request.user:
+            return Response({"detail": "Không có quyền đổi mật khẩu cho tài khoản này"}, status=403)
         unit_code = request.data.get('unit_code')
-
-        # Kiểm tra username
-        if not username or username != user.username:
-            return Response({"detail": "Tên tài khoản không đúng"}, status=400)
-        # Kiểm tra mã đơn vị
+        new_password = request.data.get('new_password')
+        if not new_password:
+            return Response({"detail": "Phải cung cấp mật khẩu mới"}, status=400)
         if unit_code and user.unit_code and unit_code != user.unit_code:
             return Response({"detail": "Mã đơn vị không khớp"}, status=400)
-        # Kiểm tra mật khẩu cũ
-        if not old_password or not user.check_password(old_password):
-            return Response({"detail": "Mật khẩu cũ không đúng"}, status=400)
-        # Kiểm tra mật khẩu mới
-        if not new_password or len(new_password) < 8:
-            return Response({"detail": "Mật khẩu mới phải có ít nhất 8 ký tự"}, status=400)
-
         user.set_password(new_password)
         user.save()
         if user == request.user:
             update_session_auth_hash(request, user)
         return Response({"detail": "Đổi mật khẩu thành công"})
-    
-    @action(detail=False, methods=['post'], url_path='forgot-password', permission_classes=[AllowAny])
-    def forgot_password(self, request):
-        username = request.data.get('username')
-        unit_code = request.data.get('unit_code')
-        new_password = request.data.get('new_password')
-
-        if not username or not unit_code or not new_password:
-            return Response({"detail": "Vui lòng nhập đầy đủ thông tin"}, status=400)
-        if len(new_password) < 8:
-            return Response({"detail": "Mật khẩu mới phải có ít nhất 8 ký tự"}, status=400)
-        try:
-            user = User.objects.get(username=username, unit_code=unit_code)
-        except User.DoesNotExist:
-            return Response({"detail": "Tên tài khoản hoặc mã đơn vị không đúng"}, status=400)
-
-        user.set_password(new_password)
-        user.save()
-        return Response({"detail": "Đặt lại mật khẩu thành công"}, status=200)

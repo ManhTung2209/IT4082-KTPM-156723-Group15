@@ -35,7 +35,7 @@ const LeftBar = ({ activeMenu }) => {
       <nav>
         <div className="vertical-nav">
           <img src={logo} alt='BlueMoon logo' />
-          <Link to="/" style={{ textDecoration: 'none' }}>
+          <Link to="/homepage" style={{ textDecoration: 'none' }}>
             <button
               className={`mainmenubtn${activeMenu === 'mainmenu' ? ' active' : ''}`}
             >

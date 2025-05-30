@@ -14,6 +14,9 @@ class Collection(models.Model):
         null=True,
         limit_choices_to={'role': 'accountant'}
     )
+    feeDate = models.DateField(null=True, blank=True)
+    feeEndDate = models.DateField(null=True, blank=True)
+    description = models.CharField(max_length=50, default="")
 
     def __str__(self):
         return f"{self.name} ({self.code})"

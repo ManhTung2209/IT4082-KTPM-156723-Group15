@@ -24,7 +24,7 @@ const FeeTable = ({ fee, onRowClick, onDetailClick }) => (
             onClick={() => onRowClick && onRowClick(fee)}
           >
             <td>{idx + 1}</td>
-            <td>{fee.feeName}</td>
+            <td>{fee.name}</td>
             <td>{fee.amount.toLocaleString()} </td>
             <td>{fee.description}</td>
             <td>

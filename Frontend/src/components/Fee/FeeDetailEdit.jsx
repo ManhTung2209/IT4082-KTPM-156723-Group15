@@ -17,23 +17,69 @@ const FeeDetailEdit = ({ fee }) => {
     setEditedFee({ ...editedFee, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    if(!editedFee.idFee || !editedFee.feeName || !editedFee.feeType || !editedFee.amount || !editedFee.feeDate
+  const handleSave = async () => {
+    if(!editedFee.code || !editedFee.name || !editedFee.type || !editedFee.amount || !editedFee.feeDate
     || !editedFee.feeEndDate){
       alert("Vui lòng nhập đầy đủ thông tin");
       return;
     }
-    // Gọi API lưu thông tin mới ở đây
-    setEditMode(false);
-    alert("Đã lưu thông tin mới!");
+    try{
+      const token = localStorage.getItem('token');
+      // const collection_id = localStorage.getItem('userId');
+      const res = await fetch(`http://127.0.0.1:8000/collections/${editedFee.collection_id}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          code: editedFee.code,
+          name: editedFee.name,
+          type: editedFee.type,
+          amount: editedFee.amount,
+          feeDate: editedFee.feeDate || null,
+          feeEndDate: editedFee.feeEndDate || null,
+          description: editedFee.description,
+        })
+      });
+      if(res.ok) {
+        alert("Đã lưu thông tin mới!");
+        setEditMode(false);
+        if (typeof onSuccess === "function") onSuccess();
+      } else {
+        const data = await res.json();
+        alert(data.detail || "Cập nhật khoản thu thất bại!");
+      }
+    } catch (errors) {
+        alert("ERRORS " + errors.message);
+        console.error("Error during registration:", errors);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const confirmDelete = window.confirm("Bạn có chắc chắn muốn xóa khoản thu này?");
     if (confirmDelete) {
+      try{
+        const token = localStorage.getItem('token');
+        const res = await fetch(`http://127.0.0.1:8000/collections/${editedFee.collection_id}/`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if(res.ok) {
+          alert("Đã xóa khoản thu!");
+          if(typeof onSuccess === "function") onSuccess();
+          navigate(-1); // Quay lại trang trước hoặc đóng modal
+        } else {
+          const data = await res.json();
+          alert(data.detail || "Xóa khoản thu thất bại!");
+        }
+      } catch (errors) {
+        alert("ERRORS " + errors.message);
+        console.error("Error during registration:", errors);
+      }
     // Gọi API hoặc logic xóa khoản thu ở đây
-      alert("Đã xóa khoản thu!");
-      navigate(-1); // Quay lại trang trước hoặc đóng modal
     }
   };
 
@@ -47,15 +93,15 @@ const FeeDetailEdit = ({ fee }) => {
           <div className="fee-info-grid">
             <div>
               <label>Mã khoản thu: </label>
-              <input name="idFee" value={editedFee.idFee} onChange={handleChange} />
+              <input name="code" value={editedFee.code} onChange={handleChange} />
             </div>
             <div>
               <label>Tên khoản thu: </label>
-              <input name="feeName" value={editedFee.feeName} onChange={handleChange} />
+              <input name="name" value={editedFee.name} onChange={handleChange} />
             </div>
             <div>
               <label>Loại khoản thu: </label>
-              <select name="feeType" value={editedFee.feeType} onChange={handleChange}>
+              <select name="type" value={editedFee.type} onChange={handleChange}>
                 <option value="Bắt buộc">Bắt buộc</option>
                 <option value="Tự nguyện">Tự nguyện</option>
               </select>
