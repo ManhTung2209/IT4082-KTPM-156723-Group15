@@ -58,7 +58,7 @@ const LoginForm = () => {
     localStorage.removeItem('rememberMe');
   }
   alert('Đăng nhập thành công!');
-  navigate('/');
+  navigate('/homepage');
 } else {
   const data = await res.json();
   alert(data.detail || "Đăng nhập thất bại!");

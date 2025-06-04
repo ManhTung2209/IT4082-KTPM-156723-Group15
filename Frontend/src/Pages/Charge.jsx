@@ -44,7 +44,21 @@ const Charge = () => {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-
+  const fetchCharges = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:8000/contributions/list/", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      if(res.ok) {
+        const data = await res.json();
+        setCharge(data);
+      }
+    } catch (errors){
+    setCharge([]);}
+  };
   // Hàm mở modal khi click vào dòng
   const handleRowClick = (charge) => {
     setSelectedCharge(charge);
@@ -55,30 +69,57 @@ const Charge = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!form.householdNumber || !form.owner || !form.feeName || !form.amount || !form.paidAt){
       alert("Vui lòng điền đầy đủ thông tin!");
       return;
     }
-    setCharge([
-      ...charge,
-      {
-        ...form,
-        id: charge.length + 1,
-      },
-    ]);
-    setShowForm(false);
-    setForm({
-      householdNumber: "",
-      owner: "",
-      feeName: "",
-      amount: "",
-      paidAt: "",
-    });
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:8000/contributions/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          household: form.householdNumber,
+          owner: form.owner,
+          feeName: form.feeName,
+          amount: form.amount,
+          payment_date: form.paidAt,
+        }),
+      });
+      if(res.ok) {
+        alert("Tạo phiếu nộp phí thành công!");
+        setShowForm(false);
+        setForm({
+          householdNumber: "",
+          owner: "",
+          feeName: "",
+          amount: "",
+          paidAt: "",
+        });
+        fetchCharges();
+      } else {
+        const data = await res.json();
+        alert(data.detail || "Tạo phiếu nộp phí thất bại!");
+      }
+    } catch (errors) {
+      alert("ERRORS " + errors.message);
+      console.error("Error during registration:", errors);
+    }
+    // setCharge([
+    //   ...charge,
+    //   {
+    //     ...form,
+    //     id: charge.length + 1,
+    //   },
+    // ]);
   };
   
   useEffect(() => {
-    setCharge(mockChargeRecords);
+    fetchCharges();
   }, []);
 
   // Lọc theo từ khóa tìm kiếm
