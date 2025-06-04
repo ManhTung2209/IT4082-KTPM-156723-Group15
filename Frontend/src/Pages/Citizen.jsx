@@ -5,64 +5,65 @@ import HeaderBar from "../components/NavBar/HeaderBar";
 import CitizenDetailEditModal from "../components/Citizen/CitizenDetailEditModal";
 import CitizenTable from "../components/Citizen/CitizenTable";
 
-// Giả lập dữ liệu cư dân
-export const mockCitizens = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    household: 502,
-    gender: "Nam",
-    birthYear: 1990,
-    hometown: "Hà Nội",
-    cccd: "012345678901",
-    cccdIssueDate: "2015-01-01",
-    cccdIssuePlace: "Cục Cảnh sát QLHC",
-    status: "Sinh sống"
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    household: 502,
-    gender: "Nữ",
-    birthYear: 1992,
-    hometown: "Hải Phòng",
-    cccd: "012345678902",
-    cccdIssueDate: "2016-02-02",
-    cccdIssuePlace: "Cục Cảnh sát QLHC",
-    status: "Tạm trú"
-  },
-  {
-    id: 3,
-    name: "Lê Văn C",
-    household: 503,
-    gender: "Nam",
-    birthYear: 1988,
-    hometown: "Nam Định",
-    cccd: "012345678903",
-    cccdIssueDate: "2017-03-03",
-    cccdIssuePlace: "Cục Cảnh sát QLHC",
-    status: "Tạm vắng"
-  },
-  // ...các phần tử còn lại, bổ sung tương tự...
-];
-
 const PAGE_SIZE = 8;
 
 const Citizen = () => {
   const [citizens, setCitizens] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // State cho modal
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    setCitizens(mockCitizens);
+    const fetchCitizens = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8000/HouseHold_Resident/citizens/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch citizens");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        // Map API data to match the expected table structure
+        const mappedCitizens = data.map((citizen) => ({
+          id: citizen.citizen_id,
+          name: citizen.full_name,
+          household: citizen.household,
+          gender: citizen.gender === "Male" ? "Nam" : "Nữ",
+          birthYear: new Date(citizen.birth_date).getFullYear(),
+          hometown: citizen.origin_place,
+          cccd: citizen.id_card_number,
+          cccdIssueDate: citizen.id_card_issue_date,
+          cccdIssuePlace: citizen.id_card_issue_place,
+          status: citizen.status === "active" ? "Sinh sống" : citizen.status,
+        }));
+
+        setCitizens(mappedCitizens);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCitizens();
   }, []);
 
   const filteredCitizens = citizens.filter(
-    c =>
+    (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.status.toLowerCase().includes(search.toLowerCase()) ||
       c.birthYear.toString().includes(search) ||
@@ -81,7 +82,6 @@ const Citizen = () => {
     page * PAGE_SIZE
   );
 
-  // Hàm mở modal khi click vào dòng
   const handleRowClick = (citizen) => {
     setSelectedCitizen(citizen);
     setModalOpen(true);
@@ -98,40 +98,47 @@ const Citizen = () => {
             type="text"
             placeholder="Tìm kiếm..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="content-search-input"
           />
         </div>
 
         <div className="content">
-          <CitizenTable
-            citizens={pagedCitizens}
-            onRowClick={handleRowClick}
-            page={page}
-           pageSize={PAGE_SIZE}
-        />
-          <div className="content-pagination">
-            <button
-              onClick={() => setPage(page - 1)}
-              disabled={page === 1}
-              className="pagination-btn"
-            >
-              Trang trước
-            </button>
-            <span className="pagination-info">
-              Trang {page} / {totalPages || 1}
-            </span>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={page === totalPages || totalPages === 0}
-              className="pagination-btn"
-            >
-              Trang sau
-            </button>
-          </div>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error: {error}</div>
+          ) : (
+            <>
+              <CitizenTable
+                citizens={pagedCitizens}
+                onRowClick={handleRowClick}
+                page={page}
+                pageSize={PAGE_SIZE}
+              />
+              <div className="content-pagination">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                  className="pagination-btn"
+                >
+                  Trang trước
+                </button>
+                <span className="pagination-info">
+                  Trang {page} / {totalPages || 1}
+                </span>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages || totalPages === 0}
+                  className="pagination-btn"
+                >
+                  Trang sau
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
-      {/* Modal hiển thị thông tin cư dân */}
       <CitizenDetailEditModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

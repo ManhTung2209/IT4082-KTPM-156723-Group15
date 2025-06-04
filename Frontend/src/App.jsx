@@ -7,7 +7,7 @@ import Home from './Pages/Home';
 import './index.css';
 import DashBoard from './Pages/DashBoard';
 import Citizen from './pages/Citizen';
-import Household from './Pages/Household';
+import Household from './pages/Household';
 import Fee from './pages/Fee';  
 import Charge from './Pages/Charge';
 function App() {

@@ -8,7 +8,7 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
     name: "",
     household: householdNumber || "",
     gender: "",
-    birthYear: "",
+    birth_date: "",
     hometown: "",
     cccd: "",
     cccdIssueDate: "",
@@ -19,7 +19,7 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
   // Reset lại mã hộ dân mỗi khi modal mở hoặc householdNumber thay đổi
   useEffect(() => {
     if (open) {
-      setCitizen(c => ({
+      setCitizen((c) => ({
         ...c,
         household: householdNumber || "",
       }));
@@ -30,27 +30,75 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
     setCitizen({ ...citizen, [e.target.name]: e.target.value });
   };
 
-  const handleAdd = () => {
-    if(!citizen.name || !citizen.household || !citizen.gender || !citizen.birthYear || !citizen.hometown || !citizen.cccd
-      || !citizen.cccdIssueDate || !citizen.cccdIssuePlace){
-        alert("Vui lòng nhập đầy đủ thông tin");
-        return;
+  const handleAdd = async () => {
+    if (
+      !citizen.name ||
+      !citizen.household ||
+      !citizen.gender ||
+      !citizen.birth_date ||
+      !citizen.hometown ||
+      !citizen.cccd ||
+      !citizen.cccdIssueDate ||
+      !citizen.cccdIssuePlace
+    ) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:8000/HouseHold_Resident/citizens/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            full_name: citizen.name,
+            household: parseInt(citizen.household, 10),
+            gender: citizen.gender === "Nam" ? "male" : "female",
+            birth_date: citizen.birth_date,
+            origin_place: citizen.hometown,
+            id_card_number: citizen.cccd,
+            id_card_issue_date: citizen.cccdIssueDate,
+            id_card_issue_place: citizen.cccdIssuePlace,
+            status:
+              citizen.status === "Sinh sống"
+                ? "sinh_song"
+                : citizen.status === "Tạm trú"
+                ? "tam_tru"
+                : citizen.status === "Tạm vắng"
+                ? "tam_vang"
+                : "sinh_song",
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message || "Đã thêm cư dân mới!");
+        if (onAddCitizen) onAddCitizen();
+        setCitizen({
+          name: "",
+          household: householdNumber || "",
+          gender: "",
+          birth_date: "",
+          hometown: "",
+          cccd: "",
+          cccdIssueDate: "",
+          cccdIssuePlace: "",
+          status: "Sinh sống",
+        });
+        onClose();
+        window.location.reload(); // Reload the page to reflect changes
+      } else {
+        alert(data.detail || "Thêm cư dân thất bại!");
       }
-    // Gọi API thêm cư dân ở đây
-    alert("Đã thêm cư dân mới!");
-    if (onAddCitizen) onAddCitizen();
-    setCitizen({
-      name: "",
-      household: householdNumber || "",
-      gender: "",
-      birthYear: "",
-      hometown: "",
-      cccd: "",
-      cccdIssueDate: "",
-      cccdIssuePlace: "",
-      status: "Sinh sống",
-    });
-    onClose();
+    } catch (err) {
+      console.error("Error adding citizen:", err);
+      alert("Lỗi kết nối tới server!");
+    }
   };
 
   return (
@@ -58,52 +106,66 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
       <h2>Thêm cư dân mới</h2>
       <div className="citizen-info-edit">
         <div className="info-grid">
-        <div>
-          <label>Họ tên: </label>
-          <input name="name" value={citizen.name} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Mã hộ dân: </label>
-          <input
+          <div>
+            <label>Họ tên: </label>
+            <input name="name" value={citizen.name} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Mã hộ dân: </label>
+            <input
               name="household"
               value={citizen.household}
               onChange={handleChange}
-              readOnly // Nếu muốn không cho sửa mã hộ dân
+              readOnly
             />
+          </div>
+          <div>
+            <label>Giới tính: </label>
+            <select name="gender" value={citizen.gender} onChange={handleChange}>
+              <option value="">Chọn giới tính</option>
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+            </select>
+          </div>
+          <div>
+            <label>Ngày sinh: </label>
+            <input
+              name="birth_date"
+              type="date"
+              value={citizen.birth_date}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Quê quán: </label>
+            <input name="hometown" value={citizen.hometown} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Mã CCCD: </label>
+            <input name="cccd" value={citizen.cccd} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Ngày cấp: </label>
+            <input
+              name="cccdIssueDate"
+              type="date"
+              value={citizen.cccdIssueDate}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>Nơi cấp: </label>
+            <input name="cccdIssuePlace" value={citizen.cccdIssuePlace} onChange={handleChange} />
+          </div>
+          <div>
+            <label>Trạng thái: </label>
+            <select name="status" value={citizen.status} onChange={handleChange}>
+              <option value="Sinh sống">Sinh sống</option>
+              <option value="Tạm trú">Tạm trú</option>
+              <option value="Tạm vắng">Tạm vắng</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label>Giới tính: </label>
-          <input name="gender" value={citizen.gender} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Năm sinh: </label>
-          <input name="birthYear" value={citizen.birthYear} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Quê quán: </label>
-          <input name="hometown" value={citizen.hometown} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Mã CCCD: </label>
-          <input name="cccd" value={citizen.cccd} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Ngày cấp: </label>
-          <input name="cccdIssueDate" value={citizen.cccdIssueDate} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Nơi cấp: </label>
-          <input name="cccdIssuePlace" value={citizen.cccdIssuePlace} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Trạng thái: </label>
-          <select name="status" value={citizen.status} onChange={handleChange}>
-            <option value="Sinh sống">Sinh sống</option>
-            <option value="Tạm trú">Tạm trú</option>
-            <option value="Tạm vắng">Tạm vắng</option>
-          </select>
-        </div>
-      </div>
       </div>
       <button style={{ marginTop: 20 }} onClick={handleAdd}>
         Thêm cư dân

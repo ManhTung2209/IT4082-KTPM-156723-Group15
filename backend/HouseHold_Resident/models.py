@@ -29,7 +29,7 @@ class Citizen(models.Model):
     birth_date = models.DateField(blank=True, null=True)
     birth_place = models.CharField(max_length=100, blank=True, null=True)
     origin_place = models.CharField(max_length=100, blank=True, null=True)
-    id_card_number = models.CharField(max_length=20, blank=True, null=True)
+    id_card_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     id_card_issue_date = models.DateField(blank=True, null=True)
     id_card_issue_place = models.CharField(max_length=100, blank=True, null=True)
     # tam tru tam vang sinh song

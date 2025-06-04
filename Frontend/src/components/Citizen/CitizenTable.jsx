@@ -1,5 +1,14 @@
 import React from "react";
 
+const statusDisplayMap = {
+  sinh_song: "Sinh sống",
+  tam_tru: "Tạm trú",
+  tam_vang: "Tạm vắng",
+  "Sinh sống": "Sinh sống",
+  "Tạm trú": "Tạm trú",
+  "Tạm vắng": "Tạm vắng",
+};
+
 const CitizenTable = ({ citizens, onRowClick }) => (
   <table className="content-table">
     <thead>
@@ -21,9 +30,9 @@ const CitizenTable = ({ citizens, onRowClick }) => (
           <tr
             key={c.id}
             style={
-              c.status === "Tạm vắng"
+              statusDisplayMap[c.status] === "Tạm vắng"
                 ? { color: "red", cursor: "pointer" }
-                : c.status === "Tạm trú"
+                : statusDisplayMap[c.status] === "Tạm trú"
                 ? { color: "green", cursor: "pointer" }
                 : { cursor: "pointer" }
             }
@@ -36,7 +45,7 @@ const CitizenTable = ({ citizens, onRowClick }) => (
             <td>{c.gender}</td>
             <td>{c.birthYear}</td>
             <td>{c.hometown}</td>
-            <td>{c.status}</td>
+            <td>{statusDisplayMap[c.status] || c.status}</td>
           </tr>
         ))
       )}
