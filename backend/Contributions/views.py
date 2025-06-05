@@ -7,9 +7,10 @@ from .models import Contribution, ContributionStatus
 from .serializers import ContributionSerializer, ContributionStatusSerializer
 from Collections.models import Collection
 from HouseHold_Resident.models import Household
+from .permissions import ContributionsPermission
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([ContributionsPermission])
 def contribution_create(request):
     """
     POST: Tạo mới khoản nộp
@@ -80,7 +81,7 @@ def contribution_detail(request, pk):
     )
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([ContributionsPermission])
 def contribution_update(request, pk):
     """
     PUT: Cập nhật toàn bộ thông tin khoản nộp
@@ -106,7 +107,7 @@ def contribution_update(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([ContributionsPermission])
 def contribution_partial_update(request, pk):
     """
     PATCH: Cập nhật một phần thông tin khoản nộp
@@ -131,8 +132,8 @@ def contribution_partial_update(request, pk):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])   
+@permission_classes([ContributionsPermission])
 def contribution_delete(request, pk):
     """
     DELETE: Xóa khoản nộp
