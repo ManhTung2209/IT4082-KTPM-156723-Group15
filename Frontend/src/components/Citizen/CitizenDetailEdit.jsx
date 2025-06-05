@@ -294,31 +294,35 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
         </div>
       )}
       <div style={{ marginTop: 20 }}>
-        {!editMode ? (
-          <>
-            <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleShowHousehold}
-            >
-              Xem thông tin hộ dân
-            </button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleDelete}
-            >
-              Xóa cư dân
-            </button>
-          </>
-        ) : (
-          <button onClick={handleSave}>Lưu thông tin</button>
-        )}
-        <HouseholdInfoModal
-          open={householdModalOpen}
-          onClose={() => setHouseholdModalOpen(false)}
-          household={selectedHousehold}
-        />
-      </div>
+  {!editMode ? (
+    <>
+      {localStorage.getItem("role") === "manager" && (
+        <>
+          <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+          <button
+            style={{ marginLeft: 12 }}
+            onClick={handleDelete}
+          >
+            Xóa cư dân
+          </button>
+        </>
+      )}
+      <button
+        style={{ marginLeft: 12 }}
+        onClick={handleShowHousehold}
+      >
+        Xem thông tin hộ dân
+      </button>
+    </>
+  ) : (
+    <button onClick={handleSave}>Lưu thông tin</button>
+  )}
+  <HouseholdInfoModal
+    open={householdModalOpen}
+    onClose={() => setHouseholdModalOpen(false)}
+    household={selectedHousehold}
+  />
+</div>
     </div>
   );
 };

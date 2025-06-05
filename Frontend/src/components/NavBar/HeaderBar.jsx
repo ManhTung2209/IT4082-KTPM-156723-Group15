@@ -5,6 +5,7 @@ import { FaUserEdit } from "react-icons/fa";
 const roleMap = {
     manager: "Tổ trưởng",
     accountant: "Kế toán",
+    deputy: "Tổ phó",
     // ...thêm các role khác nếu cần
 };
 
@@ -32,6 +33,7 @@ const HeaderBar = ({ title, onChangeUnitCode }) => {
             if (res.ok) {
                 const data = await res.json();
                 setRole(data.role); // data.role phải có trong response của API /users/info/
+                localStorage.setItem("role", data.role); // Lưu role vào localStorage nếu cần
             } else {
                 setError("Không lấy được thông tin người dùng!");
             }
