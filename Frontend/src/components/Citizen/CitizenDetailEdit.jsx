@@ -179,7 +179,7 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8000/households/${editedCitizen.household}/`,
+        `http://localhost:8000/HouseHold_Resident/households/${editedCitizen.household}/`,
         {
           method: "GET",
           headers: {

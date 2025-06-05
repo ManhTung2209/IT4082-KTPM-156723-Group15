@@ -57,6 +57,8 @@ const Fee = () => {
   const [modalHousehold, setModalHousehold] = useState(null);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [selectedHouseholdFee, setSelectedHouseholdFee] = useState(null);
+  const [householdForFee, setHouseholdForFee] = useState([]);
+  const [loadingHouseholds, setLoadingHouseholds] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all"); // "all", "paid", "unpaid"
   //State cho Modal
@@ -109,9 +111,28 @@ const Fee = () => {
   );
 
   // Khi click vào khoản thu, chuyển sang bảng hộ dân nộp khoản thu đó
-  const handleRowClick = (fee) => {
+  const handleRowClick = async (fee) => {
     setSelectedHouseholdFee(fee);
     setSelectedFee(null);
+    setLoadingHouseholds(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:8000/contributions/status-check/${fee.idFee}/households/`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHouseholdForFee(data);
+      } else {
+        setHouseholdForFee([]);
+      }
+    } catch (error){
+      setHouseholdForFee([]);
+    }
+    setLoadingHouseholds(false);
   };
 
   //Hàm mở modal khi click vào xem chi tiết
@@ -206,11 +227,12 @@ const Fee = () => {
                   </select>
               </div>
               <FeeHouseholdTable
-                households={getHouseholdsForFee(selectedHouseholdFee)}
+                households={householdForFee}
                 type={selectedHouseholdFee.type}
                 onBack={() => setSelectedHouseholdFee(null)}
                 onDetailClick={handleClickHousehold}
               />
+              {loadingHouseholds}
               <div className="content-pagination">
                 <button
                   onClick={() => setPage(page - 1)}

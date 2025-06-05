@@ -24,4 +24,5 @@ urlpatterns = [
     path("collections/", include("Collections.urls")),
     path("", include("Contributions.urls")),
     path('HouseHold_Resident/', include('HouseHold_Resident.urls')),
+    path('activity/', include('ActivityLog.urls')),
 ]

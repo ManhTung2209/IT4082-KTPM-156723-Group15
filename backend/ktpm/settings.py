@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'Users',
     'Collections',
     'Contributions',
-    'HouseHold_Resident'
+    'HouseHold_Resident',
+    'ActivityLog'
 ]
 
 MIDDLEWARE = [

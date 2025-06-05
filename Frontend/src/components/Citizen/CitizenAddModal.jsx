@@ -150,7 +150,7 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
           </div>
           <div>
             <label>Ngày sinh: </label>
-            `<input
+            <input
               name="birth_date"
               type="date"
               value={citizen.birth_date}
