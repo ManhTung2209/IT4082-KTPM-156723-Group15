@@ -129,6 +129,7 @@ const HouseholdInfo = ({ household }) => {
       }
       alert("Đã lưu thông tin hộ dân!");
       setEditMode(false);
+      window.location.reload(); 
     } catch (err) {
       alert(err.message);
     } finally {

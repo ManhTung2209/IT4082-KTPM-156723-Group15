@@ -14,20 +14,35 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
     cccdIssueDate: "",
     cccdIssuePlace: "",
     status: "Sinh sống",
+    birthYear: "", // For CitizenInfo compatibility
   });
 
-  // Reset lại mã hộ dân mỗi khi modal mở hoặc householdNumber thay đổi
+  // Reset household and form when modal opens or householdNumber changes
   useEffect(() => {
     if (open) {
-      setCitizen((c) => ({
-        ...c,
+      setCitizen({
+        name: "",
         household: householdNumber || "",
-      }));
+        gender: "",
+        birth_date: "",
+        hometown: "",
+        cccd: "",
+        cccdIssueDate: "",
+        cccdIssuePlace: "",
+        status: "Sinh sống",
+        birthYear: "",
+      });
     }
   }, [open, householdNumber]);
 
   const handleChange = (e) => {
-    setCitizen({ ...citizen, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setCitizen((prev) => ({
+      ...prev,
+      [name]: value,
+      // Update birthYear for CitizenInfo preview when birth_date changes
+      ...(name === "birth_date" && value ? { birthYear: new Date(value).getFullYear() } : {}),
+    }));
   };
 
   const handleAdd = async () => {
@@ -45,36 +60,41 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
       return;
     }
 
+    // Validate cccdIssueDate: must be at least 18 years after birth_date
+    const birthYear = new Date(citizen.birth_date).getFullYear();
+    const issueYear = new Date(citizen.cccdIssueDate).getFullYear();
+    if (issueYear < birthYear + 18) {
+      alert("Căn cước công dân không hợp lệ: Ngày cấp phải sau năm sinh ít nhất 18 năm.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:8000/HouseHold_Resident/citizens/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            full_name: citizen.name,
-            household: parseInt(citizen.household, 10),
-            gender: citizen.gender === "Nam" ? "male" : "female",
-            birth_date: citizen.birth_date,
-            origin_place: citizen.hometown,
-            id_card_number: citizen.cccd,
-            id_card_issue_date: citizen.cccdIssueDate,
-            id_card_issue_place: citizen.cccdIssuePlace,
-            status:
-              citizen.status === "Sinh sống"
-                ? "sinh_song"
-                : citizen.status === "Tạm trú"
-                ? "tam_tru"
-                : citizen.status === "Tạm vắng"
-                ? "tam_vang"
-                : "sinh_song",
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/HouseHold_Resident/citizens/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          full_name: citizen.name,
+          household: parseInt(citizen.household, 10),
+          gender: citizen.gender === "Nam" ? "male" : "female",
+          birth_date: citizen.birth_date,
+          origin_place: citizen.hometown,
+          id_card_number: citizen.cccd,
+          id_card_issue_date: citizen.cccdIssueDate,
+          id_card_issue_place: citizen.cccdIssuePlace,
+          status:
+            citizen.status === "Sinh sống"
+              ? "sinh_song"
+              : citizen.status === "Tạm trú"
+              ? "tam_tru"
+              : citizen.status === "Tạm vắng"
+              ? "tam_vang"
+              : "sinh_song",
+        }),
+      });
       const data = await response.json();
       if (response.ok) {
         alert(data.message || "Đã thêm cư dân mới!");
@@ -89,9 +109,10 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
           cccdIssueDate: "",
           cccdIssuePlace: "",
           status: "Sinh sống",
+          birthYear: "",
         });
         onClose();
-        window.location.reload(); // Reload the page to reflect changes
+        window.location.reload(); // Reload to reflect changes
       } else {
         alert(data.detail || "Thêm cư dân thất bại!");
       }
@@ -129,7 +150,7 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
           </div>
           <div>
             <label>Ngày sinh: </label>
-            <input
+            `<input
               name="birth_date"
               type="date"
               value={citizen.birth_date}

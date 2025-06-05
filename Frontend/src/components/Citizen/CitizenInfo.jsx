@@ -35,7 +35,7 @@ const CitizenInfo = ({ citizen }) => {
           <strong>Mã CCCD:</strong> {citizen.cccd}
         </div>
         <div>
-          <strong>Năm sinh:</strong> {citizen.birthYear}
+          <strong>Năm sinh:</strong> {citizen.birth_date}
         </div>
         <div>
           <strong>Nơi cấp:</strong> {citizen.cccdIssuePlace}
