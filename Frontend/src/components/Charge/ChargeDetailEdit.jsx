@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import ChargeInfo from "./ChargeInfo";
-import { useNavigate } from "react-router-dom";
 import HouseholdInfoModal from "../Household/HouseholdInfoModal";
 
-const ChargeDetailEdit = ({ charge }) => {
+const ChargeDetailEdit = ({ charge, collections = [] }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedCharge, setEditedCharge] = useState(charge);
-  const navigate = useNavigate();
 
   const [householdModalOpen, setHouseholdModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
@@ -14,29 +12,66 @@ const ChargeDetailEdit = ({ charge }) => {
   // Cập nhật lại state khi prop charge thay đổi
   useEffect(() => {
     setEditedCharge(charge);
-    setEditMode(false); // Reset về chế độ xem khi mở modal mới
+    setEditMode(false);
   }, [charge]);
+
+  // Tự động điền loại khoản thu khi feeName thay đổi
+  useEffect(() => {
+    if (!editedCharge || !editedCharge.feeName) return;
+    const found = collections.find(
+      c => c.code === editedCharge.feeName || c.name === editedCharge.feeName
+    );
+    if (found) {
+      setEditedCharge(prev => ({ ...prev, Type: found.type }));
+    }
+  }, [editedCharge.feeName, collections]);
 
   const handleChange = (e) => {
     setEditedCharge({ ...editedCharge, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
-      !editedCharge.id ||
-      !editedCharge.householdNumber ||
-      !editedCharge.owner ||
       !editedCharge.feeName ||
-      !editedCharge.Type ||
       !editedCharge.amount ||
       !editedCharge.paidAt
     ) {
       alert("Vui lòng nhập đầy đủ thông tin");
       return;
     }
-    // Gọi API lưu thông tin mới ở đây nếu cần
-    setEditMode(false);
-    alert("Đã lưu thông tin mới!");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `http://localhost:8000/contributions/${editedCharge.id}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            household: editedCharge.householdNumber,
+            code: editedCharge.feeName,
+            amount: parseInt(editedCharge.amount, 10),
+            payment_date: editedCharge.paidAt,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Lỗi khi cập nhật phiếu nộp");
+      }
+
+      setEditMode(false);
+      alert("Đã lưu thông tin mới!");
+      window.location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handleShowHousehold = async () => {
@@ -66,14 +101,35 @@ const ChargeDetailEdit = ({ charge }) => {
     }
   };
 
-  const handleDelete = () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa phiếu nộp này?")) {
-      // TODO: Gọi API xóa phiếu nộp ở đây nếu cần
-      alert("Đã xóa phiếu nộp!");
+  const handleDelete = async () => {
+  if (!window.confirm("Bạn có chắc chắn muốn xóa phiếu nộp này?")) {
+    return;
+  }
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `http://localhost:8000/contributions/${editedCharge.id}/delete/`,
+      {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    if (response.ok) {
+      alert(data.message || "Đã xóa phiếu nộp!");
+      window.location.reload();
+    } else {
+      alert(data.message || "Xóa phiếu nộp thất bại!");
     }
-  };
+  } catch (err) {
+    console.error("Error deleting charge:", err);
+    alert("Lỗi khi xóa phiếu nộp!");
+  }
+};
 
-  if (!editedCharge) return null; // Tránh lỗi khi chưa có dữ liệu
+  if (!editedCharge) return null;
 
   return (
     <div>
@@ -82,27 +138,12 @@ const ChargeDetailEdit = ({ charge }) => {
         <div className="charge-info-edit">
           <div className="charge-info-grid">
             <div>
-              <label>Mã phiếu: </label>
-              <input name="id" value={editedCharge.id} onChange={handleChange} />
-            </div>
-            <div>
-              <label>Mã hộ dân: </label>
-              <input name="householdNumber" value={editedCharge.householdNumber} onChange={handleChange} />
-            </div>
-            <div>
-              <label>Chủ hộ: </label>
-              <input name="owner" value={editedCharge.owner} onChange={handleChange} />
-            </div>
-            <div>
               <label>Tên khoản thu: </label>
               <input name="feeName" value={editedCharge.feeName} onChange={handleChange} />
             </div>
             <div>
               <label>Loại khoản thu: </label>
-              <select name="Type" value={editedCharge.Type} onChange={handleChange}>
-                <option value="Bắt buộc">Bắt buộc</option>
-                <option value="Tự nguyện">Tự nguyện</option>
-              </select>
+              <input name="Type" value={editedCharge.Type || ""} readOnly />
             </div>
             <div>
               <label>Số tiền: </label>

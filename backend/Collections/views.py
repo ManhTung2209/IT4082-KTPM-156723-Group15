@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 from .models import Collection
 from .serializers import CollectionSerializer
 from .permissions import CollectionPermission
@@ -14,6 +15,15 @@ class CollectionViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return Collection.objects.filter(unit_code=user.unit_code)
 
+    @action(detail=False, methods=["get"], url_path="all", permission_classes=[CollectionPermission])
+    def get_all_collections(self, request):
+        collections = Collection.objects.all()
+        serializer = self.get_serializer(collections, many=True)
+        return Response(
+            {"detail": "Lấy tất cả khoản thu thành công", "data": serializer.data},
+            status=status.HTTP_200_OK
+        )
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
