@@ -179,7 +179,7 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8000/HouseHold_Resident/households/${editedCitizen.household}/`,
+        `http://localhost:8000/households/${editedCitizen.household}/`,
         {
           method: "GET",
           headers: {
@@ -294,31 +294,35 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
         </div>
       )}
       <div style={{ marginTop: 20 }}>
-        {!editMode ? (
-          <>
-            <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleShowHousehold}
-            >
-              Xem thông tin hộ dân
-            </button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleDelete}
-            >
-              Xóa cư dân
-            </button>
-          </>
-        ) : (
-          <button onClick={handleSave}>Lưu thông tin</button>
-        )}
-        <HouseholdInfoModal
-          open={householdModalOpen}
-          onClose={() => setHouseholdModalOpen(false)}
-          household={selectedHousehold}
-        />
-      </div>
+  {!editMode ? (
+    <>
+      {localStorage.getItem("role") === "manager" && (
+        <>
+          <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+          <button
+            style={{ marginLeft: 12 }}
+            onClick={handleDelete}
+          >
+            Xóa cư dân
+          </button>
+        </>
+      )}
+      <button
+        style={{ marginLeft: 12 }}
+        onClick={handleShowHousehold}
+      >
+        Xem thông tin hộ dân
+      </button>
+    </>
+  ) : (
+    <button onClick={handleSave}>Lưu thông tin</button>
+  )}
+  <HouseholdInfoModal
+    open={householdModalOpen}
+    onClose={() => setHouseholdModalOpen(false)}
+    household={selectedHousehold}
+  />
+</div>
     </div>
   );
 };

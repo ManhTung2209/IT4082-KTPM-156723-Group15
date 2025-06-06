@@ -164,7 +164,7 @@ const DashBoard = () => {
               {/* {activities.length} */}
           </div>
           
-          <div className="fee-status-card">
+          {/* <div className="fee-status-card">
             <h3>{feeStatus.title}</h3>
             <div className="progress-bar">
               <div
@@ -175,7 +175,7 @@ const DashBoard = () => {
             <p>{feeStatus.progress}%</p>
             <p className="description">{feeStatus.description}</p>
             <p className="date">{feeStatus.quantity}</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

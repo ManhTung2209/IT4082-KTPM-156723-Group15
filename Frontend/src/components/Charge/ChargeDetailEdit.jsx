@@ -159,31 +159,35 @@ const ChargeDetailEdit = ({ charge, collections = [] }) => {
         <ChargeInfo charge={editedCharge} />
       )}
       <div style={{ marginTop: 20 }}>
-        {!editMode ? (
-          <>
-            <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleShowHousehold}
-            >
-              Xem thông tin hộ dân
-            </button>
-            <button
-              style={{ marginLeft: 12 }}
-              onClick={handleDelete}
-            >
-              Xóa phiếu nộp
-            </button>
-          </>
-        ) : (
-          <button onClick={handleSave}>Lưu thông tin</button>
-        )}
-        <HouseholdInfoModal
-          open={householdModalOpen}
-          onClose={() => setHouseholdModalOpen(false)}
-          household={selectedHousehold}
-        />
-      </div>
+  {!editMode ? (
+    <>
+      {localStorage.getItem("role") === "accountant" && (
+        <>
+          <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+          <button
+            style={{ marginLeft: 12 }}
+            onClick={handleDelete}
+          >
+            Xóa phiếu nộp
+          </button>
+        </>
+      )}
+      <button
+        style={{ marginLeft: 12 }}
+        onClick={handleShowHousehold}
+      >
+        Xem thông tin hộ dân
+      </button>
+    </>
+  ) : (
+    <button onClick={handleSave}>Lưu thông tin</button>
+  )}
+  <HouseholdInfoModal
+    open={householdModalOpen}
+    onClose={() => setHouseholdModalOpen(false)}
+    household={selectedHousehold}
+  />
+</div>
     </div>
   );
 };

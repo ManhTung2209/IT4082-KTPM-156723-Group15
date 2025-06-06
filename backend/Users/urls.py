@@ -8,6 +8,7 @@ from .views import (
     CookieTokenRefreshView,
     LogoutAPIView,
     UserViewSet,
+    ChangeUnitCodeView,
 )
 
 router = DefaultRouter()
@@ -20,5 +21,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='user-login'),
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token-refresh'),
     path('logout/', LogoutAPIView.as_view(), name='user-logout'),
+    path('change-unit-code/', ChangeUnitCodeView.as_view(), name='change-unit-code'),
     path('', include(router.urls)),
 ]

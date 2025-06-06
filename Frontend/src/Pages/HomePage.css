@@ -76,9 +76,9 @@
     gap: 20px;
 }
 
-.activity-card,.fee-status-card{
+.activity-card{
     height: 350px !important;
-    width: 535px;
+    width: 1090px;
     margin-top: 25px;
     height: 250px;
     border: 2px solid #ccc;

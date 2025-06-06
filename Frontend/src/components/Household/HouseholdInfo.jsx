@@ -5,6 +5,7 @@ import CitizenDetailEditModal from "../Citizen/CitizenDetailEditModal";
 import CitizenAddModal from "../Citizen/CitizenAddModal";
 
 const HouseholdInfo = ({ household }) => {
+  const isManager = localStorage.getItem("role") === "manager";
   const [editMode, setEditMode] = useState(false);
   const [editedHousehold, setEditedHousehold] = useState(household);
   const [citizens, setCitizens] = useState([]);
@@ -181,7 +182,9 @@ const HouseholdInfo = ({ household }) => {
         )}
         <div style={{ marginTop: 20 }}>
           {!editMode ? (
-            <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+            isManager && (
+              <button onClick={() => setEditMode(true)}>Sửa thông tin</button>
+            )
           ) : (
             <button onClick={handleSave}>Lưu thông tin</button>
           )}
@@ -198,12 +201,14 @@ const HouseholdInfo = ({ household }) => {
                 citizens={citizensInHousehold}
                 onRowClick={handleRowClick}
               />
-              <button
-                style={{ marginBottom: 12 }}
-                onClick={() => setAddModalOpen(true)}
-              >
-                Thêm cư dân
-              </button>
+              {isManager && (
+                <button
+                  style={{ marginBottom: 12 }}
+                  onClick={() => setAddModalOpen(true)}
+                >
+                  Thêm cư dân
+                </button>
+              )}
             </>
           )}
         </div>

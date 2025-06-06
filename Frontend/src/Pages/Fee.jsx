@@ -117,18 +117,27 @@ const Fee = () => {
     setLoadingHouseholds(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/contributions/status-check/${fee.idFee}/households/`, {
+      const res = await fetch(`http://localhost:8000/contributions/status-check/`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
       });
       if (res.ok) {
-        const data = await res.json();
-        setHouseholdForFee(data);
-      } else {
-        setHouseholdForFee([]);
+        let data = await res.json();
+      // Lọc theo mã khoản thu (id hoặc collection_id)
+      const feeId = fee.code_id;
+      data = data.filter(h => h.code_id === feeId );
+      // Lọc theo trạng thái nếu cần
+      if (filterStatus === "paid") {
+        data = data.filter(h => h.paid === true);
+      } else if (filterStatus === "unpaid") {
+        data = data.filter(h => !h.paid);
       }
+      setHouseholdForFee(data);
+    } else {
+      setHouseholdForFee([]);
+    }
     } catch (error){
       setHouseholdForFee([]);
     }
