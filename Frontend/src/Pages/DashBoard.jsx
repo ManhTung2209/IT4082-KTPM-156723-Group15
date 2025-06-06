@@ -9,18 +9,87 @@ import { LuWalletMinimal } from "react-icons/lu";
 import { FaArrowTrendUp } from "react-icons/fa6";
 
 const DashBoard = () => {
-  // const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
-  // const months = [
-  //   "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
-  //   "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
-  // ];
+  const [activities, setActivities] = useState([]);
+  const [feeCount, setFeeCount] = useState("... Khoản thu");
+  const [householdCount, setHouseholdCount] = useState("... Hộ gia đình");
+  const [residentCount, setResidentCount] = useState("... Cư dân");
+ 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch("http://localhost:8000/HouseHold_Resident/households/count/", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+        }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data.count !== "undefined"){
+          setHouseholdCount(`${data.count} Hộ gia đình`);
+        } else {
+          setHouseholdCount("0 hộ gia đình");
+        }
+      })
+      .catch(() => setHouseholdCount("... Hộ gia đình"));
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch("http://localhost:8000/HouseHold_Resident/citizens/count/", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data.count !== "undefined") {
+          setResidentCount(`${data.count} Cư dân`);
+        } else {
+          setResidentCount("0 Cư dân");
+        }
+      })
+      .catch(() => setResidentCount("... Cư dân"));
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch("http://localhost:8000/collections/count/", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data.count !== "undefined") {
+          setFeeCount(`${data.count} Khoản thu`);
+        } else {
+          setFeeCount("0 khoản thu");
+        }
+      })
+      .catch(() => setFeeCount("... Khoản thu"));
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch("http://localhost:8000/activity/recent/", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => setActivities(data))
+      .catch(() => setActivities([]));
+  }, []);
 
   const stats = [
-    {title: "Tổng số hộ khẩu", value: "... Hộ gia đình", icon: <FaHome/>, color: "#007bff"},
-    {title: "Tổng số nhân khẩu", value: "... Cư dân", icon: <FaUserGroup/>, color: "#28a745"},
-    {title: "Khoản thu hiện tại", value: "... Đang thu", icon: <LuWalletMinimal/>, color: "#ffc107" },
-    {title: "Tổng thu tháng này", value: "... VND", icon: <FaArrowTrendUp/>, color: "#6f42c1" },
+    {title: "Tổng số hộ khẩu", value: householdCount, icon: <FaHome/>, color: "#007bff"},
+    {title: "Tổng số nhân khẩu", value: residentCount, icon: <FaUserGroup/>, color: "#28a745"},
+    {title: "Khoản thu hiện tại", value: feeCount, icon: <LuWalletMinimal/>, color: "#ffc107" },
+    // {title: "Tổng thu tháng này", value: "... VND", icon: <FaArrowTrendUp/>, color: "#6f42c1" },
   ];
 
   const recentactivity = {
@@ -58,16 +127,44 @@ const DashBoard = () => {
         </div>
         <div className="details-section">
           <div className="activity-card">
-            <h3>{recentactivity.title}</h3>
+            <h3>5 Hoạt động gần đây</h3>
             <ul>
-              {recentactivity.items.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
+              {activities.length === 0 ? (
+                <li>Không có hoạt động gần đây</li>
+              ) : (
+              activities.slice(0,5).map((item, index) => {
+                let mainContent = "";
+                if (item.content && item.action && item.content.startsWith(item.action)) {
+                  mainContent = item.content.slice(item.action.length).trim();
+                } else {
+                  mainContent = item.content || "";
+                }
+                // Nếu có dấu ":" ở đầu, loại bỏ nó
+                if (mainContent.startsWith(":")) {
+                  mainContent = mainContent.slice(1).trim();
+                }
+                return (
+                  <li key={index}>
+                    <span>
+                    <span style={{ fontWeight: "bold", fontSize: "0.9em" }}>
+                      {item.action || "Hoạt động"}
+                    </span>
+                    <span style={{ fontSize: "0.9em", marginLeft: 4 }}>
+                      {mainContent ? `: ${mainContent}` : ""}
+                    </span>
+                    </span>
+                    <span style={{fontSize: "0.8em", color: "#888", display: "flex", whiteSpace: "nowrap"}}>
+                      {item.date}
+                    </span>
+                  </li>
+                );
+              })
+            )}
             </ul>
-            <p className="date">{recentactivity.date}</p>
+              {/* {activities.length} */}
           </div>
           
-          <div className="fee-status-card">
+          {/* <div className="fee-status-card">
             <h3>{feeStatus.title}</h3>
             <div className="progress-bar">
               <div
@@ -78,7 +175,7 @@ const DashBoard = () => {
             <p>{feeStatus.progress}%</p>
             <p className="description">{feeStatus.description}</p>
             <p className="date">{feeStatus.quantity}</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

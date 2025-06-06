@@ -8,6 +8,7 @@ from .serializers import ContributionSerializer, ContributionStatusSerializer
 from Collections.models import Collection
 from HouseHold_Resident.models import Household
 from .permissions import ContributionsPermission
+from ActivityLog.models import ActivityLog
 
 @api_view(['POST'])
 @permission_classes([ContributionsPermission])
@@ -19,6 +20,11 @@ def contribution_create(request):
     serializer = ContributionSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
+        ActivityLog.objects.create(
+            user = request.user,
+            action="Tạo phiếu nộp",
+            content=f"Hộ dân {contribution.household.room_number} nộp khoản {contribution.code.name}"
+        )
         # Cập nhật hoặc tạo ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -93,6 +99,11 @@ def contribution_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=False, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            action="Sửa phiếu nộp",
+            content=f"Sửa phiếu nộp {contribution.code.name} của hộ dân {contribution.household.room_number}"
+        )
         # Cập nhật ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -119,6 +130,11 @@ def contribution_partial_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=True, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            action="Sửa phiếu nộp",
+            content=f"Sửa phiếu nộp {contribution.code.name} của hộ dân {contribution.household.room_number}"
+        )
         # Cập nhật ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -158,18 +174,40 @@ def contribution_delete(request, pk):
 @permission_classes([IsAuthenticated])
 def contribution_status_check(request):
     """
-    GET: Hiển thị trạng thái nộp của tất cả hộ gia đình cho tất cả khoản thu
+    GET: Hiển thị trạng thái nộp của tất cả hộ gia đình cho tất cả khoản thu,
+    bao gồm cả những hộ chưa nộp (CHƯA NỘP)
     """
-    # Lấy query params để lọc
     room_number = request.query_params.get('room_number')
-    code = request.query_params.get('code')
+    code_filter = request.query_params.get('code')
 
-    # Lọc ContributionStatus
-    status_qs = ContributionStatus.objects.select_related('household', 'code').all()
+    households = Household.objects.all()
+    collections = Collection.objects.all()
+
     if room_number:
-        status_qs = status_qs.filter(household__room_number=room_number)
-    if code:
-        status_qs = status_qs.filter(code__code=code)
+        households = households.filter(room_number=room_number)
+    if code_filter:
+        collections = collections.filter(code=code_filter)
 
-    serializer = ContributionStatusSerializer(status_qs, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    all_statuses = []
+
+    for household in households:
+        for collection in collections:
+            # Kiểm tra xem đã tồn tại trạng thái chưa
+            try:
+                status_obj = ContributionStatus.objects.get(household=household, code=collection)
+                serializer = ContributionStatusSerializer(status_obj)
+                all_statuses.append(serializer.data)
+            except ContributionStatus.DoesNotExist:
+                # Tạo trạng thái mặc định là CHƯA NỘP
+                status_data = {
+                    'household_id': household.household_id,
+                    'block_name': household.block_name,
+                    'room_number': household.room_number,
+                    'owner_name': household.owner_name,
+                    'code': collection.code,
+                    'collection_name': collection.name,
+                    'status': 'CHƯA NỘP'
+                }
+                all_statuses.append(status_data)
+
+    return Response(all_statuses, status=status.HTTP_200_OK)

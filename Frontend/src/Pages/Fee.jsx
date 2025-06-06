@@ -57,6 +57,8 @@ const Fee = () => {
   const [modalHousehold, setModalHousehold] = useState(null);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [selectedHouseholdFee, setSelectedHouseholdFee] = useState(null);
+  const [householdForFee, setHouseholdForFee] = useState([]);
+  const [loadingHouseholds, setLoadingHouseholds] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all"); // "all", "paid", "unpaid"
   //State cho Modal
@@ -109,9 +111,37 @@ const Fee = () => {
   );
 
   // Khi click vào khoản thu, chuyển sang bảng hộ dân nộp khoản thu đó
-  const handleRowClick = (fee) => {
+  const handleRowClick = async (fee) => {
     setSelectedHouseholdFee(fee);
     setSelectedFee(null);
+    setLoadingHouseholds(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:8000/contributions/status-check/`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        let data = await res.json();
+      // Lọc theo mã khoản thu (id hoặc collection_id)
+      const feeId = fee.code_id;
+      data = data.filter(h => h.code_id === feeId );
+      // Lọc theo trạng thái nếu cần
+      if (filterStatus === "paid") {
+        data = data.filter(h => h.paid === true);
+      } else if (filterStatus === "unpaid") {
+        data = data.filter(h => !h.paid);
+      }
+      setHouseholdForFee(data);
+    } else {
+      setHouseholdForFee([]);
+    }
+    } catch (error){
+      setHouseholdForFee([]);
+    }
+    setLoadingHouseholds(false);
   };
 
   //Hàm mở modal khi click vào xem chi tiết
@@ -206,11 +236,12 @@ const Fee = () => {
                   </select>
               </div>
               <FeeHouseholdTable
-                households={getHouseholdsForFee(selectedHouseholdFee)}
+                households={householdForFee}
                 type={selectedHouseholdFee.type}
                 onBack={() => setSelectedHouseholdFee(null)}
                 onDetailClick={handleClickHousehold}
               />
+              {loadingHouseholds}
               <div className="content-pagination">
                 <button
                   onClick={() => setPage(page - 1)}

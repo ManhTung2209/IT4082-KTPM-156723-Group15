@@ -38,7 +38,7 @@
 .stat-grid{
     display: grid;
     grid-template-columns: repeat(4, 250px);
-    gap: 30px;
+    gap: 140px;
 }
 
 .stat-card{
@@ -50,7 +50,7 @@
     font-size: 12px;
     flex-direction: column;
     align-items: flex-start;
-    min-width: 160px;
+    width: 310px;
     height: 100px;
 }
 
@@ -61,11 +61,11 @@
 }
 
 .stat-card-header h3{
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .stat-card p {
-    font-size: 12px;
+    font-size: 13px;
     color: #333;
     margin-top: 10px;
 }
@@ -76,9 +76,9 @@
     gap: 20px;
 }
 
-.activity-card,.fee-status-card{
-    height: 300px !important;
-    width: 535px;
+.activity-card{
+    height: 350px !important;
+    width: 1090px;
     margin-top: 25px;
     height: 250px;
     border: 2px solid #ccc;

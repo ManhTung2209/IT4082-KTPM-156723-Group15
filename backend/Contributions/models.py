@@ -32,7 +32,12 @@ class ContributionStatus(models.Model):
         related_name='status_by_code',
         to_field='code'
     )
-    status = models.CharField(max_length=10, choices=[('Đã nộp', 'ĐÃ NỘP'), ('Chưa nộp', 'CHƯA NỘP')], default='CHƯA NỘP')
+    status = models.CharField(
+    max_length=10,
+    choices=[('ĐÃ NỘP', 'ĐÃ NỘP'), ('CHƯA NỘP', 'CHƯA NỘP')],
+    default='CHƯA NỘP'
+)
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

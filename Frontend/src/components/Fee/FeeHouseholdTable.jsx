@@ -33,18 +33,18 @@ const FeeHouseholdTable = ({ households, type = "fee", config, onBack, onDetailC
           ) : (
             households.map((h, idx) => (
               <tr
-                key={h.id}
+                key={h.household_id}
                 style={{
-                  color: h[field] ? "green" : "red",
+                  color: h.status ? "green" : "red",
                   fontWeight: 600,
                   cursor: "default"
                 }}
                 // onClick={() => onRowClick && onRowClick(h)}
               >
                 <td>{idx + 1}</td>
-                <td>{h.householdNumber}</td>
-                <td>{h.owner}</td>
-                <td>{h[field] ? "Đã nộp" : "Chưa nộp"}</td>
+                <td>{h.household_id}</td>
+                <td>{h.owner_name}</td>
+                <td>{h.status}</td>
                 <td>
                   <span style={{ color: "#1890ff", cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => 
