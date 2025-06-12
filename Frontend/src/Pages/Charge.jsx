@@ -121,6 +121,20 @@ const Charge = () => {
     }
   };
 
+  //Autofill money (mandatory fee)
+  useEffect(() => {
+  if (!form.feeName) {
+    setForm(f => ({ ...f, amount: "" }));
+    return;
+  }
+  
+  const collection = collections.find(c => c.code === form.feeName);
+  if (collection && collection.type === "Bắt buộc") {
+    setForm(f => ({ ...f, amount: collection.amount.toString() }));
+  }
+}, [form.feeName, collections]);
+  
+
   useEffect(() => {
     fetchHouseholds();
     fetchCollections();
@@ -286,6 +300,7 @@ const Charge = () => {
               type="number"
               value={form.amount}
               onChange={handleChange}
+              readOnly={collections.find(c => c.code === form.feeName)?.type === "Bắt buộc"}
             />
             <input
               name="paidAt"

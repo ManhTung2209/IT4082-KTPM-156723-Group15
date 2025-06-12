@@ -112,11 +112,11 @@ const FeeDetailEdit = ({ fee }) => {
             </div>
             <div>
               <label>Ngày tạo: </label>
-              <input name="feeDate" value={editedFee.feeDate} onChange={handleChange} />
+              <input name="feeDate" type="date" value={editedFee.feeDate} onChange={handleChange} />
             </div>
             <div>
               <label>Ngày hết hạn: </label>
-              <input name="feeEndDate" value={editedFee.feeEndDate} onChange={handleChange} />
+              <input name="feeEndDate" type="date" value={editedFee.feeEndDate} onChange={handleChange} />
             </div>
             <div>
               <label>Ghi chú: </label>

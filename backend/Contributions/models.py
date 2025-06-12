@@ -21,7 +21,7 @@ class Contribution(models.Model):
     class Meta:
         unique_together = ('household', 'code')
 
-    def __str__(self):
+    def str(self):
         return f"{self.household} - {self.amount} - {self.payment_date}"
 
 class ContributionStatus(models.Model):
@@ -43,5 +43,5 @@ class ContributionStatus(models.Model):
     class Meta:
         unique_together = ('household', 'code')
 
-    def __str__(self):
+    def str(self):
         return f"{self.household} - {self.code} - {self.status}"

@@ -78,13 +78,23 @@
 
 .activity-card{
     height: 350px !important;
-    width: 1090px;
+    width: 650px;
     margin-top: 25px;
     height: 250px;
     border: 2px solid #ccc;
     padding: 10px;
     display: block;
     border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fee-status-card{
+    height: 350px !important;
+    width: 420px;
+    margin-top: 25px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

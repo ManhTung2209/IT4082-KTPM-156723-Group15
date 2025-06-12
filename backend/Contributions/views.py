@@ -7,11 +7,9 @@ from .models import Contribution, ContributionStatus
 from .serializers import ContributionSerializer, ContributionStatusSerializer
 from Collections.models import Collection
 from HouseHold_Resident.models import Household
-from .permissions import ContributionsPermission
-from ActivityLog.models import ActivityLog
 
 @api_view(['POST'])
-@permission_classes([ContributionsPermission])
+@permission_classes([IsAuthenticated])
 def contribution_create(request):
     """
     POST: Tạo mới khoản nộp
@@ -20,11 +18,6 @@ def contribution_create(request):
     serializer = ContributionSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        ActivityLog.objects.create(
-            user = request.user,
-            action="Tạo phiếu nộp",
-            content=f"Hộ dân {contribution.household.room_number} nộp khoản {contribution.code.name}"
-        )
         # Cập nhật hoặc tạo ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -65,7 +58,7 @@ def contribution_list(request):
 @permission_classes([IsAuthenticated])
 def contribution_detail(request, pk):
     """
-    GET: Lấy chi tiết khoản nộp
+    GET: Xem chi tiết khoản nộp
     """
     contribution = get_object_or_404(Contribution, pk=pk)
     serializer = ContributionSerializer(contribution)
@@ -87,7 +80,7 @@ def contribution_detail(request, pk):
     )
 
 @api_view(['PUT'])
-@permission_classes([ContributionsPermission])
+@permission_classes([IsAuthenticated])
 def contribution_update(request, pk):
     """
     PUT: Cập nhật toàn bộ thông tin khoản nộp
@@ -99,11 +92,6 @@ def contribution_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=False, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        ActivityLog.objects.create(
-            user=request.user,
-            action="Sửa phiếu nộp",
-            content=f"Sửa phiếu nộp {contribution.code.name} của hộ dân {contribution.household.room_number}"
-        )
         # Cập nhật ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -118,7 +106,7 @@ def contribution_update(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PATCH'])
-@permission_classes([ContributionsPermission])
+@permission_classes([IsAuthenticated])
 def contribution_partial_update(request, pk):
     """
     PATCH: Cập nhật một phần thông tin khoản nộp
@@ -130,11 +118,6 @@ def contribution_partial_update(request, pk):
     serializer = ContributionSerializer(contribution, data=request.data, partial=True, context={'request': request})
     if serializer.is_valid():
         contribution = serializer.save()
-        ActivityLog.objects.create(
-            user=request.user,
-            action="Sửa phiếu nộp",
-            content=f"Sửa phiếu nộp {contribution.code.name} của hộ dân {contribution.household.room_number}"
-        )
         # Cập nhật ContributionStatus
         status_instance, created = ContributionStatus.objects.update_or_create(
             household=contribution.household,
@@ -148,8 +131,8 @@ def contribution_partial_update(request, pk):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['DELETE'])   
-@permission_classes([ContributionsPermission])
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def contribution_delete(request, pk):
     """
     DELETE: Xóa khoản nộp
@@ -174,40 +157,52 @@ def contribution_delete(request, pk):
 @permission_classes([IsAuthenticated])
 def contribution_status_check(request):
     """
-    GET: Hiển thị trạng thái nộp của tất cả hộ gia đình cho tất cả khoản thu,
-    bao gồm cả những hộ chưa nộp (CHƯA NỘP)
+    GET: Hiển thị trạng thái nộp của tất cả hộ dân cho một khoản thu cụ thể (dựa vào code).
+    Nếu hộ dân chưa nộp, sẽ trả về trạng thái 'CHƯA NỘP'.
     """
-    room_number = request.query_params.get('room_number')
     code_filter = request.query_params.get('code')
+    if not code_filter:
+        return Response(
+            {"detail": "Thiếu tham số 'code'."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        collection = Collection.objects.get(code=code_filter)
+    except Collection.DoesNotExist:
+        return Response(
+            {"detail": "Khoản thu không tồn tại."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if collection.type == "Tự nguyện":
+        # Chỉ lấy những hộ dân đã nộp
+        paid_statuses = ContributionStatus.objects.filter(
+            code=collection,
+            status='ĐÃ NỘP'
+        )
+        all_statuses = [ContributionStatusSerializer(status).data for status in paid_statuses]
+        return Response(all_statuses, status=status.HTTP_200_OK)
 
     households = Household.objects.all()
-    collections = Collection.objects.all()
-
-    if room_number:
-        households = households.filter(room_number=room_number)
-    if code_filter:
-        collections = collections.filter(code=code_filter)
-
     all_statuses = []
 
     for household in households:
-        for collection in collections:
-            # Kiểm tra xem đã tồn tại trạng thái chưa
-            try:
-                status_obj = ContributionStatus.objects.get(household=household, code=collection)
-                serializer = ContributionStatusSerializer(status_obj)
-                all_statuses.append(serializer.data)
-            except ContributionStatus.DoesNotExist:
-                # Tạo trạng thái mặc định là CHƯA NỘP
-                status_data = {
-                    'household_id': household.household_id,
-                    'block_name': household.block_name,
-                    'room_number': household.room_number,
-                    'owner_name': household.owner_name,
-                    'code': collection.code,
-                    'collection_name': collection.name,
-                    'status': 'CHƯA NỘP'
-                }
-                all_statuses.append(status_data)
+        try:
+            status_obj = ContributionStatus.objects.get(household=household, code=collection)
+            serializer = ContributionStatusSerializer(status_obj)
+            all_statuses.append(serializer.data)
+        except ContributionStatus.DoesNotExist:
+            # Nếu chưa nộp, trả về thông tin hộ + trạng thái CHƯA NỘP
+            status_data = {
+                'household_id': household.household_id,
+                'block_name': household.block_name,
+                'room_number': household.room_number,
+                'owner_name': household.owner_name,
+                'code': collection.code,
+                'collection_name': collection.name,
+                'status': 'CHƯA NỘP'
+            }
+            all_statuses.append(status_data)
 
     return Response(all_statuses, status=status.HTTP_200_OK)

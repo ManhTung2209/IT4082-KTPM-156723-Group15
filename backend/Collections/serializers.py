@@ -15,6 +15,7 @@ class CollectionSerializer(serializers.ModelSerializer):
         code = data.get('code')
         name = data.get('name')
         amount = data.get('amount')
+        feeType = data.get('type')
 
         # Validate code
         if code is None or len(code) < 1 or len(code) > 11:
@@ -27,8 +28,14 @@ class CollectionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Hãy nhập tên khoản thu hợp lệ (1-50 ký tự)!")
 
         # Validate amount
-        if amount is None or amount <= 0 or amount >= 10**11:
-            raise serializers.ValidationError("Hãy nhập số tiền hợp lệ (số nguyên dương, nhỏ hơn 11 chữ số)!")
+        if feeType == "Bắt buộc":
+            if amount is None or amount <= 0 or amount >= 10**11:
+                raise serializers.ValidationError("Hãy nhập số tiền hợp lệ (số nguyên dương, nhỏ hơn 11 chữ số)!")
+        elif feeType == "Tự nguyện":
+            if amount is None or amount == "":
+                data['amount'] = 0
+            elif amount < 0 or amount >= 10**11:
+                raise serializers.ValidationError("Số tiền phải là số không âm và nhỏ hơn 11 chữ số!")
 
         return data
 

@@ -220,10 +220,10 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
               <label>Số phòng: </label>
               <input value={householdInfo?.room_number || ""} readOnly />
             </div>
-            <div>
+            {/* <div>
               <label>Tên tòa: </label>
               <input value={householdInfo?.block_name || ""} readOnly />
-            </div>
+            </div> */}
             <div>
               <label>Giới tính: </label>
               <input name="gender" value={editedCitizen.gender} onChange={handleChange} />
@@ -273,7 +273,7 @@ const CitizenDetailEdit = ({ citizen, onCitizenUpdated }) => {
           <div className="info-grid">
             <div><strong>Họ tên:</strong> {editedCitizen.name}</div>
             <div><strong>Số phòng:</strong> {householdInfo?.room_number || ""}</div>
-            <div><strong>Tên tòa:</strong> {householdInfo?.block_name || ""}</div>
+            {/* <div><strong>Tên tòa:</strong> {householdInfo?.block_name || ""}</div> */}
             <div><strong>Giới tính:</strong> {editedCitizen.gender}</div>
             <div><strong>Ngày sinh:</strong> {editedCitizen.birth_date}</div>
             <div><strong>Quê quán:</strong> {editedCitizen.hometown}</div>
