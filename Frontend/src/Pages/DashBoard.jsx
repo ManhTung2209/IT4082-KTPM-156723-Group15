@@ -131,7 +131,7 @@ const DashBoard = () => {
         </div>
         <div className="details-section">
           <div className="activity-card">
-            <h3>5 Hoạt động gần đây</h3>
+            <h3>Hoạt động gần đây</h3>
             <ul>
               {activities.length === 0 ? (
                 <li>Không có hoạt động gần đây</li>

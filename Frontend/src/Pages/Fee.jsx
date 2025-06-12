@@ -70,39 +70,46 @@ const Fee = () => {
     page * PAGE_SIZE
   );
 
-  // Khi click vào khoản thu, chuyển sang bảng hộ dân nộp khoản thu đó
-  const handleRowClick = async (fee) => {
-    setSelectedHouseholdFee(fee);
-    setSelectedFee(null);
+  const fetchHouseholds = async (feeCode) => {
     setLoadingHouseholds(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/contributions/status-check/?code=${fee.code}`, {
+      const res = await fetch(`http://localhost:8000/contributions/status-check/?code=${feeCode}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
       });
       if (res.ok) {
-      let data = await res.json();
-      // Lọc theo mã khoản thu (id hoặc collection_id)
-      // const feeId = fee.code || fee.id || fee.collection_id;
-      // data = data.filter(h => h.code_id === feeId );
-      // Lọc theo trạng thái nếu cần
-      if (filterStatus === "paid") {
-        data = data.filter(h => h.paid === true);
-      } else if (filterStatus === "unpaid") {
-        data = data.filter(h => !h.paid);
+        let data = await res.json();
+        if (filterStatus === "paid") {
+          data = data.filter(h => h.status === 'ĐÃ NỘP');
+        } else if (filterStatus === "unpaid") {
+          data = data.filter(h => h.status === 'CHƯA NỘP');
+        }
+        setHouseholdForFee(data);
+      } else {
+        setHouseholdForFee([]);
       }
-      setHouseholdForFee(data);
-    } else {
-      setHouseholdForFee([]);
-    }
-    } catch (error){
+    } catch (error) {
+      console.error("Error fetching households:", error);
       setHouseholdForFee([]);
     }
     setLoadingHouseholds(false);
   };
+
+  const handleRowClick = async (fee) => {
+    setSelectedHouseholdFee(fee);
+    setSelectedFee(null);
+    await fetchHouseholds(fee.code);
+  };
+
+  //Theo dõi thay đổi của filterStatus
+  useEffect(() => {
+    if (selectedHouseholdFee) {
+      fetchHouseholds(selectedHouseholdFee.code);
+    }
+  }, [filterStatus]);
 
   //Hàm mở modal khi click vào xem chi tiết
   const handleEditFee = (fee) => {
@@ -182,19 +189,21 @@ const Fee = () => {
               <h2 className="content-title">
                 Danh sách hộ dân nộp: {selectedHouseholdFee.feeName}
               </h2>
+              {selectedHouseholdFee && selectedHouseholdFee.type === "Bắt buộc" && (
               <div className="filterhousehold-btn">
                 <label htmlFor="filter-select" style={{marginRight: "8px"}}>Lọc:</label>
-                  <select
-                    id = "filter-select"
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="all">Tất cả</option>
-                    <option value="paid">Đã nộp</option>
-                    <option value="unpaid">Chưa nộp</option>
-                  </select>
+                <select
+                  id="filter-select"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="all">Tất cả</option>
+                  <option value="paid">Đã nộp</option>
+                  <option value="unpaid">Chưa nộp</option>
+                </select>
               </div>
+              )}
               <FeeHouseholdTable
                 households={householdForFee}
                 type={selectedHouseholdFee.status}
