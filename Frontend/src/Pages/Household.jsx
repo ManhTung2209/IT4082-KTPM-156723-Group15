@@ -140,7 +140,7 @@ const Household = () => {
                   <tr>
                     <th>STT</th>
                     <th>Số phòng</th>
-                    <th>Tên tòa</th>
+                    <th>Chủ hộ</th>
                     <th>Số dân cư đang cư trú</th>
                   </tr>
                 </thead>
@@ -168,7 +168,7 @@ const Household = () => {
                         >
                           <td>{(page - 1) * PAGE_SIZE + idx + 1}</td>
                           <td>{h.room_number}</td>
-                          <td>{h.block_name}</td>
+                          <td>{h.owner}</td>
                           <td>{livingCount}</td>
                         </tr>
                       );

@@ -102,7 +102,7 @@ const HouseholdInfo = ({ household }) => {
   };
 
   const handleSave = async () => {
-    if (!editedHousehold.owner || !editedHousehold.block_name || !editedHousehold.room_number) {
+    if (!editedHousehold.owner || !editedHousehold.room_number) {
       alert("Vui lòng nhập đầy đủ tên chủ hộ, tên tòa và số phòng");
       return;
     }
@@ -159,10 +159,10 @@ const HouseholdInfo = ({ household }) => {
       <div className="household-info">
         {editMode ? (
           <div className="info-grid">
-            <div>
+            {/* <div>
               <label>Tên tòa: </label>
               <input name="block_name" value={editedHousehold.block_name || ""} onChange={handleChange} />
-            </div>
+            </div> */}
             <div>
               <label>Số phòng: </label>
               <input name="room_number" value={editedHousehold.room_number || ""} onChange={handleChange} />
@@ -174,7 +174,7 @@ const HouseholdInfo = ({ household }) => {
           </div>
         ) : (
           <>
-            <div><strong>Tên tòa:</strong> {editedHousehold.block_name}</div>
+            {/* <div><strong>Tên tòa:</strong> {editedHousehold.block_name}</div> */}
             <div><strong>Số phòng:</strong> {editedHousehold.room_number}</div>
             <div><strong>Chủ hộ:</strong> {editedHousehold.owner}</div>
             <div><strong>Số dân cư đang cư trú:</strong> {livingCount}</div>

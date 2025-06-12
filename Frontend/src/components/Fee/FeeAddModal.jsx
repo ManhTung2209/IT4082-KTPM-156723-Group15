@@ -20,13 +20,18 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
     };
 
     const handleAdd = async () => {
-        if(!fee.code || !fee.name || !fee.type || !fee.amount || !fee.feeDate
+        if(!fee.code || !fee.name || !fee.type || !fee.feeDate
         || !fee.feeEndDate){
             alert("Vui lòng nhập đầy đủ thông tin");
             return;
         }
+        if(fee.type === "Bắt buộc" && !fee.amount) {
+            alert("Vui lòng nhập số tiền!");
+            return;
+        }
         try{
             const token = localStorage.getItem('token');
+            const value_type = fee.type === "Bắt buộc" ? parseInt(fee.amount) || 0 : 0;
             const res = await fetch("http://127.0.0.1:8000/collections/", {
                 method: "POST",
                 headers: {
@@ -37,7 +42,9 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
                     code: fee.code,
                     name: fee.name,
                     type: fee.type,
-                    amount: fee.amount,
+                    amount: value_type,
+                    // unit_code: user.unit_code, // Thêm dòng này
+                    // recorded_by_id: user.id,
                     feeDate: fee.feeDate || null,
                     feeEndDate: fee.feeEndDate || null,
                     description: fee.description,
@@ -88,15 +95,17 @@ const FeeAddModal = ({ open, onClose, defaultFee }) => {
                 </div>
                 <div>
                     <label>Số tiền: </label>
-                    <input name="amount" value={fee.amount} onChange={handleChange}/>
+                    <input name="amount" value={fee.amount} onChange={handleChange}
+                        required={fee.type === "Bắt buộc"}
+                    />
                 </div>
                 <div>
                     <label>Ngày tạo: </label>
-                    <input name="feeDate" value={fee.feeDate} onChange={handleChange}/>
+                    <input name="feeDate" type="date" value={fee.feeDate} onChange={handleChange}/>
                 </div>
                 <div>
                     <label>Ngày hết hạn: </label>
-                    <input name="feeEndDate" value={fee.feeEndDate} onChange={handleChange}/>
+                    <input name="feeEndDate" type="date" value={fee.feeEndDate} onChange={handleChange}/>
                 </div>
                 <div>
                     <label>Ghi chú: </label>

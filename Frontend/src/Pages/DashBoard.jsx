@@ -6,7 +6,6 @@ import './HomePage.css';
 import { FaHome } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { LuWalletMinimal } from "react-icons/lu";
-import { FaArrowTrendUp } from "react-icons/fa6";
 
 const DashBoard = () => {
 
@@ -14,7 +13,24 @@ const DashBoard = () => {
   const [feeCount, setFeeCount] = useState("... Khoản thu");
   const [householdCount, setHouseholdCount] = useState("... Hộ gia đình");
   const [residentCount, setResidentCount] = useState("... Cư dân");
- 
+  const [feeList, setFeeList] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+      fetch("http://localhost:8000/collections/", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setFeeList(data);
+          else setFeeList([]);
+      })
+      .catch(() => setFeeList([]));
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetch("http://localhost:8000/HouseHold_Resident/households/count/", {
@@ -92,22 +108,10 @@ const DashBoard = () => {
     // {title: "Tổng thu tháng này", value: "... VND", icon: <FaArrowTrendUp/>, color: "#6f42c1" },
   ];
 
-  const recentactivity = {
-    title: "Hoạt động gần đây",
-    items: [
-      "5 hoạt động gần nhất trong hệ thống",
-      "Thêm khoản thu mới",
-      "Phí gửi ô tô - 50000"
-    ],
-    date: "25/05/2025",
-  };
-
-  const feeStatus = {
-    title: "Tình hình thu phí",
-    progress: 78,
-    description: "Tỷ lệ phí trong tháng hiện tại",
-    quantity: "96/124 hóa đơn",
-  };
+  // const feeStatus = {
+  //   title: "Tình hình thu phí",
+  //   progress: feeProgress.percent,
+  // };
   return (
     <div>
       <LeftBar activeMenu="mainmenu"/>
@@ -164,18 +168,26 @@ const DashBoard = () => {
               {/* {activities.length} */}
           </div>
           
-          {/* <div className="fee-status-card">
-            <h3>{feeStatus.title}</h3>
-            <div className="progress-bar">
-              <div
-                className="progress"
-                style={{ width: `${feeStatus.progress}%`, backgroundColor: "#007bff" }}
-              ></div>
-            </div>
-            <p>{feeStatus.progress}%</p>
-            <p className="description">{feeStatus.description}</p>
-            <p className="date">{feeStatus.quantity}</p>
-          </div> */}
+          <div className="fee-status-card">
+            <h3>Tình hình thu phí</h3>
+            <ul style={{ paddingLeft: 16}}>
+              {feeList.length === 0 ? (
+                <li>Không có khoản thu nào</li>
+              ) : (
+                feeList.map((fee, idx) => (
+                  <li key={fee.collection_id || idx}>
+                    <span style={{ fontWeight: 600}}>{fee.name}:</span>{" "}
+                    Đến hạn vào ngày{" "}
+                    <span style={{ fontWeight: 600}}>
+                      {fee.feeEndDate
+                      ? new Date(fee.feeEndDate).toLocaleDateString("vi-VN")
+                      : "Chưa xác định"}
+                    </span>
+                  </li> 
+                ))
+              )}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

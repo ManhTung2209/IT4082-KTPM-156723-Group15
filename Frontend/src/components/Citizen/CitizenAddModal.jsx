@@ -132,7 +132,7 @@ const CitizenAddModal = ({ open, onClose, householdNumber, onAddCitizen }) => {
             <input name="name" value={citizen.name} onChange={handleChange} />
           </div>
           <div>
-            <label>Mã hộ dân: </label>
+            <label>Số phòng: </label>
             <input
               name="household"
               value={citizen.household}

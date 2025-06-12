@@ -2,15 +2,6 @@ import React, {useState} from "react";
 
 const FeeHouseholdTable = ({ households, type = "fee", config, onBack, onDetailClick }) => {
   const columnTitle = "Trạng thái";
-  const field =
-    config?.field ||
-    (type === "toll"
-      ? "tollPaid"
-      : type === "water"
-      ? "waterPaid"
-      : type === "electric"
-      ? "electricPaid"
-      : "feePaid");
 
   return (
     <div>
@@ -35,7 +26,7 @@ const FeeHouseholdTable = ({ households, type = "fee", config, onBack, onDetailC
               <tr
                 key={h.household_id}
                 style={{
-                  color: h.status ? "green" : "red",
+                  color: h.status === "ĐÃ NỘP" ? "green" : "red",
                   fontWeight: 600,
                   cursor: "default"
                 }}

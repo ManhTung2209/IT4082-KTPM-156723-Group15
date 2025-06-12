@@ -8,46 +8,6 @@ import FeeTable from "../components/Fee/FeeTable";
 import FeeHouseholdTable from "../components/Fee/FeeHouseholdTable";
 import HouseholdInfoModal from   "../components/Household/HouseholdInfoModal";
 
-
-// Giả lập dữ liệu hộ dân và trạng thái nộp phí
-const mockHouseholds = [
-  { id: 1, householdNumber: 502, owner: "Nguyễn Văn A", tollPaid: true, feePaid: false },
-  { id: 2, householdNumber: 503, owner: "Lê Văn C", tollPaid: false, feePaid: true },
-  { id: 3, householdNumber: 504, owner: "Phạm Thị D", tollPaid: false, feePaid: false },
-];
-
-//Giả lập dữ liệu khoản thu
-const mockFee = [
-  {
-    idFee: 1,
-    feeName: "Phí gửi ô tô t5/2025",
-    feeType: "Bắt buộc",
-    amount: 500000 + " VNĐ",
-    feeDate: "15/05/2025",
-    feeEndDate: "31/05/2025",
-    description: "",
-  },
-  {
-    idFee: 2,
-    feeName: "Phí gửi xe máy",
-    feeType: "Bắt buộc",
-    amount: 100000 + " VNĐ",
-    feeDate: "15/05/2025",
-    feeEndDate: "31/05/2025",
-    description: "Thu theo tháng",
-  },
-  {
-    idFee: 3,
-    feeName: "Trung thu",
-    feeType: "Tự nguyện",
-    amount:  + " VNĐ",
-    feeDate: "14/06/2025",
-    feeEndDate: "30/06/2025",
-    description: "Tùy tâm",
-  },
-  // ...các phần tử còn lại, bổ sung tương tự...
-];
-
 const PAGE_SIZE = 8;
 
 const Fee = () => {
@@ -117,17 +77,17 @@ const Fee = () => {
     setLoadingHouseholds(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/contributions/status-check/`, {
+      const res = await fetch(`http://localhost:8000/contributions/status-check/?code=${fee.code}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
       });
       if (res.ok) {
-        let data = await res.json();
+      let data = await res.json();
       // Lọc theo mã khoản thu (id hoặc collection_id)
-      const feeId = fee.code_id;
-      data = data.filter(h => h.code_id === feeId );
+      // const feeId = fee.code || fee.id || fee.collection_id;
+      // data = data.filter(h => h.code_id === feeId );
       // Lọc theo trạng thái nếu cần
       if (filterStatus === "paid") {
         data = data.filter(h => h.paid === true);
@@ -237,7 +197,7 @@ const Fee = () => {
               </div>
               <FeeHouseholdTable
                 households={householdForFee}
-                type={selectedHouseholdFee.type}
+                type={selectedHouseholdFee.status}
                 onBack={() => setSelectedHouseholdFee(null)}
                 onDetailClick={handleClickHousehold}
               />
@@ -279,7 +239,6 @@ const Fee = () => {
         onSuccess = {fetchFees}
       />
       <HouseholdInfoModal
-        
         open={modalHousehold}
         onClose={() => setModalHousehold(null)}
         household={selectedHousehold}
