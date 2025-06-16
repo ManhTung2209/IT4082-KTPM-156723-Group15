@@ -86,6 +86,7 @@
     display: block;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.7;
 }
 
 .fee-status-card{
@@ -96,6 +97,7 @@
     border-radius: 5px;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.7;
 }
 
 .activity-card h3,
@@ -120,10 +122,10 @@
     margin-top: 10px;
 }
 
-.fee-status-card .progress-bar {
+/* .fee-status-card .progress-bar {
     background-color: #e9ecef;
     margin: 3px 0;
-}
+} */
 
 .fee-status-card .progress {
     transition: width 0.3s ease;

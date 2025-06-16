@@ -8,6 +8,7 @@ import "./Page.css";
 const PAGE_SIZE = 10;
 
 const Charge = () => {
+  const isAccountant = localStorage.getItem('role') === 'accountant';
   const [charge, setCharge] = useState([]);
   const [households, setHouseholds] = useState([]);
   const [collections, setCollections] = useState([]);
@@ -266,12 +267,15 @@ const Charge = () => {
             className="content-search-input"
           />
         </div>
-        <button
+        { isAccountant && (
+          <button
           onClick={() => setShowForm(true)}
           style={{ marginBottom: 16, background: "#1890ff" }}
         >
           + Tạo phiếu nộp mới
         </button>
+        )}
+        
         {showForm && (
           <div style={{ marginBottom: 24, border: "1px solid #ccc", padding: 17 }}>
             <h3>Phiếu nộp phí</h3>
