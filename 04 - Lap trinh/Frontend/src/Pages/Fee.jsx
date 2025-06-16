@@ -11,6 +11,7 @@ import HouseholdInfoModal from   "../components/Household/HouseholdInfoModal";
 const PAGE_SIZE = 8;
 
 const Fee = () => {
+  const isAccountant = localStorage.getItem("role") === "accountant";
   const [fee, setFee] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -150,12 +151,14 @@ const Fee = () => {
             className="content-search-input"
           />
         </div>
-        <button
+        { isAccountant && (
+          <button
           className="add-btn"
           style={{ padding: "8px 16px", background: "#1890ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}
           onClick={() => setAddModalOpen(true)}
         > + Thêm khoản thu
         </button>
+        )}
         <div className="content">
           {!selectedHouseholdFee ? (
             <>
